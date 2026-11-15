@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0b6a5d">
+<meta name="description" content="직업계고 현장실습 Q&amp;A, 학생·학교·교사·기업체 취업지원 자료, 직업계고 취업통계를 한곳에서 제공하는 앱">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="미래 JOB GO">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>미래 JOB GO</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/fp.css?v=202611150249">
+<link rel="stylesheet" href="css/app.css?v=202611150249">
+<script src="js/config.js?v=202611150249" defer></script>
+<script src="data/content.js?v=202611150249" defer></script>
+<script src="js/core.js?v=202611150249" defer></script>
+<script src="js/fp-ask.js?v=202611150249" defer></script>
+<script src="js/fp-ui.js?v=202611150249" defer></script>
+<script src="js/views.js?v=202611150249" defer></script>
+</head>
+<body>
+<a class="skip" href="#view">본문 바로가기</a>
+
+<header class="appbar">
+  <a class="brand" href="#/home" aria-label="미래 JOB GO 홈">
+    <img src="icons/icon-64.png" width="34" height="34" alt="">
+    <span class="bt"><b>미래 JOB GO</b><small>직업계고 현장실습·취업지원</small></span>
+  </a>
+  <div class="appbar-r">
+    <button type="button" class="iconbtn" id="btnSearch" aria-label="통합 검색"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button type="button" class="iconbtn" id="btnUpdate" aria-label="자료 업데이트 확인"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="dot" id="updDot" hidden></span></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidenav" aria-label="주 메뉴">
+    <a href="#/home" data-nav="home"><span class="ni ni-home" aria-hidden="true"></span>홈</a>
+    <a href="#/fp" data-nav="fp"><span class="ni ni-fp" aria-hidden="true"></span>현장실습 Q&amp;A</a>
+    <a href="#/res" data-nav="res"><span class="ni ni-res" aria-hidden="true"></span>취업지원 자료실</a>
+    <div class="navgroup">대상별 안내</div>
+    <a href="#/role/student" data-nav="role-student" class="sub">학생</a>
+    <a href="#/role/teacher" data-nav="role-teacher" class="sub">교사</a>
+    <a href="#/role/jobcoach" data-nav="role-jobcoach" class="sub">취업지원관</a>
+    <a href="#/role/school" data-nav="role-school" class="sub">학교</a>
+    <a href="#/role/company" data-nav="role-company" class="sub">기업체</a>
+    <div class="navgroup">정보</div>
+    <a href="#/schedule" data-nav="schedule"><span class="ni ni-cal" aria-hidden="true"></span>주요 일정</a>
+    <a href="#/stats" data-nav="stats"><span class="ni ni-stat" aria-hidden="true"></span>취업통계(KEDI)</a>
+    <a href="#/notices" data-nav="notices"><span class="ni ni-bell" aria-hidden="true"></span>공지사항</a>
+    <a href="#/more" data-nav="more"><span class="ni ni-more" aria-hidden="true"></span>설치·설정·앱 정보</a>
+  </nav>
+
+  <main id="view" tabindex="-1">
+    <div class="boot" id="boot"><div class="spin" aria-hidden="true"></div><p>자료를 확인하고 있습니다…</p></div>
+
+    <section class="view" data-view="home" hidden></section>
+    <section class="view" data-view="search" hidden></section>
+    <section class="view" data-view="role" hidden></section>
+    <section class="view" data-view="res" hidden></section>
+    <section class="view" data-view="resdetail" hidden></section>
+    <section class="view" data-view="schedule" hidden></section>
+    <section class="view" data-view="stats" hidden></section>
+    <section class="view" data-view="notices" hidden></section>
+    <section class="view" data-view="more" hidden></section>
+
+    <section class="view fpview" data-view="fp" hidden>
+      <div class="fphead">
+        <h1 class="vt">현장실습 업무 Q&amp;A</h1>
+        <p class="vsub" id="fpSource"></p>
+      </div>
+      <div class="bar">
+        <div class="wrap">
+          <nav class="tabs" role="tablist" aria-label="보기 선택">
+            <a class="tab" href="#/fp/ask" role="tab" data-tab="ask" aria-selected="true">질문하기</a>
+            <a class="tab" href="#/fp/cases" role="tab" data-tab="cases" aria-selected="false">사례 분석<span class="n" id="n-cases"></span></a>
+            <a class="tab" href="#/fp/keys" role="tab" data-tab="keys" aria-selected="false">핵심 기준</a>
+            <a class="tab" href="#/fp/calc" role="tab" data-tab="calc" aria-selected="false">계산기</a>
+            <a class="tab" href="#/fp/laws" role="tab" data-tab="laws" aria-selected="false">근거 법령</a>
+            <a class="tab" href="#/fp/forms" role="tab" data-tab="forms" aria-selected="false">서식 찾기</a>
+          </nav>
+        </div>
+      </div>
+      <div class="wrap fpbody">
+
+<section id="p-ask" role="tabpanel">
+
+<form autocomplete="off" class="askbox needjs" id="askform">
+<label class="asklab" for="askq">현장실습 업무에 관해 궁금한 점을 문장으로 적어 주세요</label>
+<textarea autocapitalize="off" autocorrect="off" enterkeyhint="send" id="askq" placeholder="예: 현장실습을 21일 실시합니다. 이러한 경우 순회지도를 몇 회 해야 하나요?" rows="3" spellcheck="false"></textarea>
+<div class="askrow">
+<span class="askhint">매뉴얼 원문·법령·Q&amp;A에서 근거를 찾아 답합니다. 인터넷 연결 없이도 작동합니다.</span>
+<button class="askbtn" type="submit">답변 보기</button>
+</div>
+</form>
+<div class="examples needjs" id="examples"></div>
+<div class="thread" id="thread"></div>
+</section>
+<section id="p-qa" role="tabpanel">
+<div class="quick" id="quick"></div>
+<div class="chips needjs" id="chips"></div>
+<div class="listhead">
+<span class="count" id="count">126개 질문</span>
+<button class="ghost needjs" id="toggleAll" type="button">모두 펼치기</button>
+</div>
+<div class="qlist" id="qlist"></div>
+</section>
+<section id="p-cases" role="tabpanel">
+<h2>사례 분석</h2>
+<p class="hint">학교에서 실제로 마주칠 만한 상황을 ‘상황 → 쟁점 → 판단 → 조치’ 순서로 정리했습니다.</p>
+<div class="cases" id="cases"></div>
+</section>
+<section id="p-keys" role="tabpanel">
+<h2>핵심 기준 한눈에</h2>
+<p class="hint">숫자로 정해진 기준만 모았습니다. 오른쪽 숫자는 매뉴얼 쪽수입니다.</p>
+<div class="panel" id="keys"></div>
+</section>
+<section id="p-calc" role="tabpanel">
+<h2>업무 계산기</h2>
+<p class="hint">입력값은 예시로 채워 두었습니다. 결과는 매뉴얼 기준의 최소 요건이며, 학사일정·재량휴업일은 직접 제외일로 넣어 주세요.</p>
+
+<div class="calcs">
+<div class="calc">
+<h3>순회지도 횟수·실습일수 계산</h3>
+<div class="fields">
+<label class="fld" for="c1s">실습 시작일<input id="c1s" type="date" value="2026-10-19"/></label>
+<label class="fld" for="c1e">실습 종료일<input id="c1e" type="date" value="2026-11-16"/></label>
+<label class="fld" for="c1x">기타 제외일(재량휴업 등)<input id="c1x" inputmode="numeric" min="0" type="number" value="0"/></label>
+</div>
+<div class="out" id="c1o"></div>
+<div id="c1m"></div>
+</div>
+<div class="calc">
+<h3>실습시간·수당·지원금 계산</h3>
+<div class="fields">
+<label class="fld" for="c2d">실습일수(일)<input id="c2d" inputmode="numeric" max="120" min="1" type="number" value="21"/></label>
+<label class="fld" for="c2h">1일 실습시간<select id="c2h"><option>4</option><option>5</option><option>6</option><option selected="">7</option><option value="8">8 (1시간 연장)</option></select></label>
+<label class="fld" for="c2t">기업현장교사 1명당 지도 학생<select id="c2t"><option selected="" value="1">1명(1:1)</option><option value="2">2명</option></select></label>
+</div>
+<div class="out" id="c2o"></div>
+<div id="c2m"></div>
+</div>
+</div>
+</section>
+<section id="p-laws" role="tabpanel">
+<h2>근거 법령</h2>
+<p class="hint">조문 요약과 매뉴얼 수록 쪽수입니다. 조문명을 누르면 국가법령정보센터로 이동합니다.</p>
+<div id="laws" class="lawlist"></div>
+</section>
+<section id="p-forms" role="tabpanel">
+<h2>서식·자료 찾기</h2>
+<p class="hint">매뉴얼에 실린 서식·자료·예시의 쪽수입니다.</p>
+<div class="fgrid" id="forms"></div>
+</section>
+
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="하단 메뉴">
+  <a href="#/home" data-nav="home"><span class="ni ni-home" aria-hidden="true"></span><span>홈</span></a>
+  <a href="#/fp" data-nav="fp"><span class="ni ni-fp" aria-hidden="true"></span><span>현장실습</span></a>
+  <a href="#/res" data-nav="res"><span class="ni ni-res" aria-hidden="true"></span><span>자료실</span></a>
+  <a href="#/stats" data-nav="stats"><span class="ni ni-stat" aria-hidden="true"></span><span>취업통계</span></a>
+  <a href="#/more" data-nav="more"><span class="ni ni-more" aria-hidden="true"></span><span>더보기</span></a>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="vtip" id="vtip" role="tooltip" hidden></div>
+<noscript><div class="noscript">이 앱은 자바스크립트가 필요합니다. 크롬·엣지·사파리·삼성 인터넷 등 최신 브라우저로 열어 주세요.</div></noscript>
+</body>
+</html>
