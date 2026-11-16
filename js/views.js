@@ -7,6 +7,24 @@
   var ROLE_INI = { student: '학', teacher: '교', jobcoach: '취', school: '관', company: '기', supervisor: '장' };
 
   function D() { return MJG.data; }
+  /* 광주·전남과 통합(참고) 지표. 통합 값은 두 시도 원자료를 합산해 KEDI 산식으로 다시 계산한 참고치입니다.
+   * 취업률 = 취업자 ÷ (졸업자 − 진학자 − 입대자 − 제외인정자) × 100 */
+  function gjjn(rel) {
+    var by = function (n) { return (rel.sido || []).filter(function (x) { return x.sido === n; })[0]; };
+    var g = by('광주'), j = by('전남'); if (!g || !j) return null;
+    var sum = function (k) { return (g[k] == null || j[k] == null) ? null : g[k] + j[k]; };
+    var c = { sido: '광주·전남 통합(참고)', schools: sum('schools'), grad: sum('grad'), emp: sum('emp'), adv: sum('adv'), enl: sum('enl'), exc: sum('exc'), ins: sum('ins'), inside: sum('inside') };
+    var den = c.grad - c.adv - c.enl - c.exc;
+    c.rate = den > 0 ? Math.round(c.emp / den * 1000) / 10 : null;
+    c.advRate = c.grad ? Math.round(c.adv / c.grad * 1000) / 10 : null;
+    var others = (rel.sido || []).filter(function (x) { return x.sido !== '광주' && x.sido !== '전남'; });
+    c.rank = c.rate == null ? null : 1 + others.filter(function (x) { return x.rate > c.rate; }).length;
+    c.nRank = others.length + 1;
+    var rg = (rel.ret && rel.ret.sido || []), rgj = rg.filter(function (x) { return x.sido === '광주'; })[0], rjn = rg.filter(function (x) { return x.sido === '전남'; })[0];
+    if (rgj && rjn && rgj.ins + rjn.ins) { c.ret2 = Math.round((rgj.ins * rgj.rate2 + rjn.ins * rjn.rate2) / (rgj.ins + rjn.ins) * 10) / 10; }
+    return { g: g, j: j, c: c, rg: rgj, rj: rjn };
+  }
+  MJG.gjjn = gjjn;
   function qaById(id) { var q = window.QA || []; for (var i = 0; i < q.length; i++) if (q[i].id === id) return { x: q[i], no: i + 1 }; return null; }
   function resById(id) { var r = D().resources; for (var i = 0; i < r.length; i++) if (r[i].id === id) return r[i]; return null; }
   function who(list) { return '<span class="who">' + (list || []).map(function (k) { return ROLE[k] ? '<i>' + ROLE[k] + '</i>' : ''; }).join('') + '</span>'; }
@@ -47,7 +65,7 @@
   V.home = function (el) {
     var d = D(), st = d.stats, R0 = (st.releases || [])[0] || {}, nat = (R0.national || []).filter(function (x) { return x.type === '전체'; })[0] || {};
     var pv = (st.trend || []).filter(function (t) { return t.type === '전체' && t.pub === R0.pub - 1; })[0];
-    var gj = (R0.sido || []).filter(function (x) { return x.sido === '광주'; })[0];
+    var gj = (R0.sido || []).filter(function (x) { return x.sido === '광주'; })[0], jn = (R0.sido || []).filter(function (x) { return x.sido === '전남'; })[0];
     var pins = d.notices.slice().sort(function (a, b) { return (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || (a.date < b.date ? 1 : -1); }).slice(0, 3);
     var up = schedSorted().filter(function (o) { return o.st.k !== 'end'; }).slice(0, 4);
     var quick = (window.FP.QUICK || []).slice(0, 6).map(qaById).filter(Boolean);
@@ -66,10 +84,11 @@
       pins.map(function (n) { return '<a class="li" href="#/notices/' + esc(n.id) + '"><span class="ld">' + esc(MJG.fmtDate(n.date)) + '</span><span class="lb"><b>' + (n.pin ? '<span class="pin">고정</span>' : '') + esc(n.title) + '</b></span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>다가오는 일정 <a href="#/schedule">전체 일정</a></h2>' + schedHtml(up) + '</div>' +
       '<div class="sect"><h2>' + esc(R0.pub) + '년 발표 직업계고 취업통계 <a href="#/stats">자세히</a></h2>' +
-      '<p class="cohortline"><b>대상</b> ' + esc(R0.cohort) + '(' + esc(R0.gradLabel) + ') · 조사기준일 ' + esc(R0.surveyDate) + '</p><div class="statstrip">' +
+      '<p class="cohortline"><b>대상</b> ' + esc(R0.cohort) + '(' + esc(R0.gradLabel) + ') · 조사기준일 ' + esc(R0.surveyDate) + '</p><div class="statstrip s5">' +
       '<div class="tile"><span class="tl">취업률</span><span class="tv">' + pct(nat.rate) + '</span><span class="td">' + (diff != null ? (diff >= 0 ? '<span class="up">▲ ' : '<span class="down">▼ ') + Math.abs(diff).toFixed(1) + '%p</span> 전년 대비' : '') + '</span></div>' +
       '<div class="tile"><span class="tl">진학률</span><span class="tv">' + pct(nat.advRate) + '</span><span class="td">졸업자 대비</span></div>' +
       '<div class="tile"><span class="tl">광주 취업률</span><span class="tv">' + pct(gj && gj.rate) + '</span><span class="td">17개 시도 중 ' + (gj ? esc(gj.rank) : '–') + '위</span></div>' +
+      '<div class="tile"><span class="tl">전남 취업률</span><span class="tv">' + pct(jn && jn.rate) + '</span><span class="td">17개 시도 중 ' + (jn ? esc(jn.rank) : '–') + '위</span></div>' +
       '<div class="tile"><span class="tl">300인 이상 기업 취업</span><span class="tv">' + pct(R0.big300) + '</span><span class="td">취업자 중 비중</span></div>' +
       '</div><p class="muted m0" id="hstatsrc"></p></div>' +
       '<div class="sect"><h2>현장실습, 이렇게 물어보세요 <a href="#/fp/ask">질문하기</a></h2><div class="quickgrid">' +
@@ -131,7 +150,7 @@
       '<p class="hitnote" id="hitnote" hidden></p>' +
       '<div class="sect"><h2>꼭 알아둘 기준</h2><dl class="facts">' + (ro.keyfacts || []).map(function (f) { return '<dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('') + '</dl></div>' +
       '<a class="statlink" href="#/stats" id="toStats"><span><b>' + esc(ro.name) + '에게 필요한 취업통계 보기</b><small>' + esc({ student: '내 계열 취업률, 선배들이 취업한 회사 규모·업종, 취업 유지율', teacher: '광주·전남과 전국 비교, 학교유형·계열별 취업률, 유지취업률', jobcoach: '시도·계열별 취업률, 업종·규모별 취업처, 관내·관외 취업', school: '시도 순위, 학교유형·설립주체별 비교, 연도별 추이', company: '업종·사업장 규모별 취업자, 계열별 배출 인원', supervisor: '우리 지역 4개년 추이·시도 순위, 보고용 요약 문장(개조식), 연계 사업 바로가기' }[ro.key] || '') + '</small></span><span aria-hidden="true">→</span></a>' +
-      '<div class="sect"><h2>함께 보면 좋은 메뉴</h2><div class="guidegrid2">' + [['#/center', '센', '취업지원센터', '지원 사업·13개교 학과 현황·취업 후 혜택'], ['#/district', '혁', '빛고을 직업교육혁신지구', '취업동아리 현황·지역대학 연계·정주지원금'], ['#/fp/leaf', '실', '현장실습 리플릿 요약', '운영 기준·지원금·적용 법령']].map(function (m) { return '<a class="guidecard" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><span class="gb"><b>' + m[2] + '</b><small>' + m[3] + '</small></span><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div></div>' +
+      '<div class="sect"><h2>함께 보면 좋은 메뉴</h2><div class="guidegrid2">' + (ro.key === 'supervisor' ? [['#/fpstat', '통', '현장실습 통계(장학사 확인용)', '학교별 참여·유형·기업·취업 전환·지원금'], ['#/stats', '취', '취업통계 정책 브리핑', '광주·전남 4개년 추이·보고용 요약 문장']] : []).concat([['#/center', '센', '취업지원센터', '지원 사업·13개교 학과 현황·취업 후 혜택'], ['#/district', '혁', '빛고을 직업교육혁신지구', '취업동아리 현황·지역대학 연계·정주지원금'], ['#/fp/leaf', '실', '현장실습 리플릿 요약', '운영 기준·지원금·적용 법령']]).map(function (m) { return '<a class="guidecard" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><span class="gb"><b>' + m[2] + '</b><small>' + m[3] + '</small></span><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>단계별 체크리스트 <button type="button" class="ghost" id="ckreset">체크 초기화</button></h2><p class="muted m0" id="ckhint"></p><div class="phases">' +
       (ro.phases || []).map(function (ph, pi) {
         var done = 0; (ph.items || []).forEach(function (it, ii) { if (saved[pi + '-' + ii]) done++; });
@@ -152,6 +171,7 @@
         el.querySelector('[data-pc="' + pi + '"]').textContent = dn + '/' + ph.items.length;
       });
     });
+    el.querySelectorAll('.guidegrid2 a[href="#/stats"]').forEach(function (a) { a.addEventListener('click', function () { SS.lens = 'sup'; MJG.store.set('mjg.statLens', 'sup'); }); });
     el.querySelector('#toStats').addEventListener('click', function () { SS.lens = { student: 'student', teacher: 'teacher', jobcoach: 'teacher', school: 'teacher', company: 'company', supervisor: 'sup' }[ro.key] || 'all'; MJG.store.set('mjg.statLens', SS.lens); });
     el.querySelector('#ckreset').addEventListener('click', function () { MJG.store.del(ck); MJG._keepScroll = true; V.role(el, r); });
     el.querySelector('#toRes').addEventListener('click', function () { resState.role = ro.key; resState.cat = ''; resState.q = ''; });
@@ -410,9 +430,9 @@
     if (!rels.length) { el.innerHTML = '<h1 class="vt">취업통계</h1><p class="muted">아직 등록된 통계가 없습니다.</p>'; return; }
     if (SS.pub == null) SS.pub = rels[0].pub;
     if (SS.lens == null) SS.lens = MJG.store.get('mjg.statLens') || 'all';
-    if (SS.region == null) SS.region = MJG.store.get('mjg.statRegion') || '광주';
+    if (SS.region == null) SS.region = MJG.store.get('mjg.statRegion2') || '';
     var R = rel(), P = relPrev(R), A = natAll(R), PA = P ? natAll(P) : (st.trend || []).filter(function (t) { return t.type === '전체' && t.pub === R.pub - 1; })[0];
-    var G = sidoOf(R, SS.region) || R.sido[0], GP = P ? sidoOf(P, SS.region) : null;
+    var G = sidoOf(R, '광주') || R.sido[0], GP = P ? sidoOf(P, G.sido) : null, GX = SS.region ? sidoOf(R, SS.region) : null;
     var show = function (id) { var s = SEC.filter(function (x) { return x[0] === id; })[0]; return s[2].indexOf(SS.lens) >= 0; };
     var h = '';
 
@@ -429,28 +449,34 @@
     /* 0. 장학사: 정책 브리핑 */
     if (show('pol')) {
       var AP = function (r) { return (r.national || []).filter(function (x) { return x.type === '전체'; })[0] || {}; };
-      var rows4 = rels.slice().sort(function (a, b) { return b.pub - a.pub; }).map(function (r) {
-        var g = sidoOf(r, G.sido) || {}, a = AP(r);
-        return { pub: r.pub, cohort: r.cohort, rate: g.rate, rank: g.rank, nat: a.rate, gap: g.rate != null && a.rate != null ? g.rate - a.rate : null, adv: g.advRate, ins: g.ins ? g.inside / g.ins * 100 : null };
-      });
       var sgn = function (v) { return v == null ? '–' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + '%p'; };
-      var rrP = (R.ret && R.ret.sido || []).filter(function (x) { return x.sido === G.sido; })[0];
-      var brief = '○ ' + R.pub + '년 KEDI 직업계고 졸업자 취업통계(' + R.releasedAt + ' 발표, 대상: ' + R.cohort + '·' + R.gradLabel + ')\n' +
-        ' - ' + G.sido + ' 직업계고 취업률 ' + pct(G.rate) + '(전국 ' + pct(A.rate) + ', ' + sgn(G.rate - A.rate) + '), 17개 시도 중 ' + G.rank + '위' + (GP ? '(전년 ' + GP.rank + '위)' : '') + '\n' +
-        ' - 진학률 ' + pct(G.advRate) + ', 지역 안(관내) 취업 비중 ' + (G.ins ? (G.inside / G.ins * 100).toFixed(1) + '%' : '–') + '(관내 ' + fmtN(G.inside) + '명/보험가입 취업자 ' + fmtN(G.ins) + '명)\n' +
-        ' - 학교유형별 취업률: 특성화고 ' + pct(G.sp) + ', 마이스터고 ' + pct(G.mt) + ', 일반고 직업반 ' + pct(G.gv) + '\n' +
-        (rrP ? ' - 1년 유지취업률 ' + pct(rrP.rate2) + '(' + R.ret.cohort + ' 기준)\n' : '') +
-        ' ※ 발표연도와 대상 학년도 구분: ' + R.pub + '년 발표 = ' + R.cohort;
-      h += sectHead('pol', '정책 브리핑(' + esc(G.sido) + ')', '보고서·예상질의답변서에 바로 쓸 수 있도록 정리했습니다. 아래 ‘한눈에 보기 → 우리 지역’에서 다른 시도를 고르면 그 시도 기준으로 바뀝니다.');
-      h += '<div class="card"><h3>보고용 요약 문장 <button type="button" class="btn sm line" id="ssCopy">복사</button></h3><textarea class="brief" id="ssBrief" readonly rows="7" aria-label="보고용 요약 문장">' + esc(brief) + '</textarea><p class="m0 small muted">개조식(○, -) 형식입니다. 한글 문서에 붙여 넣은 뒤 표준 양식에 맞춰 다듬으세요.</p></div>';
-      h += '<div class="card"><h3>' + esc(G.sido) + ' 4개년 추이 <span class="muted small">(발표연도 기준, 괄호는 대상 학년도)</span></h3><div class="tablewrap"><table class="dtable"><thead><tr><th>발표(대상)</th><th class="n">취업률</th><th class="n">순위</th><th class="n">전국</th><th class="n">전국 대비</th><th class="n">진학률</th><th class="n">관내 취업</th></tr></thead><tbody>' +
-        rows4.map(function (x) { return '<tr' + (x.pub === R.pub ? ' class="em"' : '') + '><td>' + x.pub + '년 발표<br><small class="muted">' + esc(x.cohort) + '</small></td><td class="n">' + pct(x.rate) + '</td><td class="n">' + (x.rank == null ? '–' : esc(String(x.rank)) + '위') + '</td><td class="n">' + pct(x.nat) + '</td><td class="n">' + sgn(x.gap) + '</td><td class="n">' + pct(x.adv) + '</td><td class="n">' + (x.ins == null ? '–' : x.ins.toFixed(1) + '%') + '</td></tr>'; }).join('') +
-        '</tbody></table></div></div>';
+      var Q = gjjn(R), QP = P ? gjjn(P) : null;
+      var line = function (x, xp, rr0, nm) {
+        if (!x) return '';
+        return ' - ' + nm + ' 취업률 ' + pct(x.rate) + '(전국 대비 ' + sgn(x.rate - A.rate) + '), ' + (x.nRank ? '16개 시도 기준 ' : '17개 시도 중 ') + x.rank + '위' + (xp && xp.rank != null ? '(전년 ' + xp.rank + '위)' : '') +
+          ', 진학률 ' + pct(x.advRate) + ', 관내 취업 ' + (x.ins ? (x.inside / x.ins * 100).toFixed(1) + '%' : '–') + (rr0 != null ? ', 1년 유지취업률 ' + pct(rr0) : '') + '\n';
+      };
+      var brief = '○ ' + R.pub + '년 KEDI 직업계고 졸업자 취업통계(' + R.releasedAt + ' 발표)\n' +
+        ' - 대상: ' + R.cohort + '(' + R.gradLabel + '), 전국 취업률 ' + pct(A.rate) + '\n' +
+        (Q ? line(Q.g, QP && QP.g, Q.rg && Q.rg.rate2, '광주') + line(Q.j, QP && QP.j, Q.rj && Q.rj.rate2, '전남') + line(Q.c, QP && QP.c, Q.c.ret2, '광주·전남 통합(참고·자체 합산)') : line(G, GP, null, G.sido)) +
+        (GX ? line(GX, P ? sidoOf(P, GX.sido) : null, null, GX.sido) : '') +
+        ' ※ ' + R.pub + '년 발표 = ' + R.cohort + ' 대상. 통합 수치는 두 시도 원자료 합산 재계산값(KEDI 공식값 아님)' + (R.ret ? ', 유지취업률은 ' + R.ret.cohort + ' 기준' : '');
+      h += sectHead('pol', '정책 브리핑(광주·전남)', '보고서·예상질의답변서에 바로 쓸 수 있도록 광주·전남과 통합(참고) 수치를 함께 정리했습니다. ‘한눈에 보기’에서 다른 시도를 고르면 그 시도도 함께 들어갑니다.');
+      h += '<div class="card"><h3>보고용 요약 문장 <button type="button" class="btn sm line" id="ssCopy">복사</button></h3><textarea class="brief" id="ssBrief" readonly rows="8" aria-label="보고용 요약 문장">' + esc(brief) + '</textarea><p class="m0 small muted">개조식(○, -) 형식입니다. 한글 문서에 붙여 넣은 뒤 표준 양식에 맞춰 다듬으세요.</p></div>';
+      var rows4 = rels.slice().sort(function (a, b) { return b.pub - a.pub; }).map(function (r) {
+        var q = gjjn(r) || {}, a2 = AP(r);
+        return { pub: r.pub, cohort: r.cohort, nat: a2.rate, g: q.g || {}, j: q.j || {}, c: q.c || {} };
+      });
+      var cell = function (x, nat) { return x.rate == null ? '<td class="n">–</td>' : '<td class="n">' + pct(x.rate) + '<br><small class="muted">' + x.rank + '위 · ' + sgn(x.rate - nat) + '</small></td>'; };
+      h += '<div class="card"><h3>광주·전남 4개년 추이 <span class="muted small">(발표연도 기준, 아래는 대상 학년도)</span></h3><div class="tablewrap"><table class="dtable gjtable"><thead><tr><th>발표(대상)</th><th class="n">광주</th><th class="n">전남</th><th class="n cb">통합(참고)</th><th class="n">전국</th></tr></thead><tbody>' +
+        rows4.map(function (x) { return '<tr' + (x.pub === R.pub ? ' class="em"' : '') + '><td>' + x.pub + '년 발표<br><small class="muted">' + esc(x.cohort) + '</small></td>' + cell(x.g, x.nat) + cell(x.j, x.nat) + cell(x.c, x.nat).replace('<td class="n">', '<td class="n cb">') + '<td class="n">' + pct(x.nat) + '</td></tr>'; }).join('') +
+        '</tbody></table></div><p class="m0 small muted">칸 아래 작은 글씨: 순위 · 전국 대비. 통합(참고) 순위는 광주·전남을 하나로 본 16개 시도 기준입니다.</p></div>';
       h += '<div class="card"><h3>연계 사업·자료 바로가기</h3><div class="guidegrid2">' +
         '<a class="guidecard" href="#/center/programs"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터 지원 사업</b><small>역량 강화·공공기관 면접·채용연계형 직무교육, 13개교 학과 현황</small></span><span class="ga" aria-hidden="true">→</span></a>' +
         '<a class="guidecard" href="#/district/clubs"><span class="ri" aria-hidden="true">혁</span><span class="gb"><b>혁신지구 취업동아리 현황</b><small>40팀 580명, 학교·계열 검색 시 합계 자동 계산</small></span><span class="ga" aria-hidden="true">→</span></a>' +
         '<a class="guidecard" href="#/district/benefit"><span class="ri" aria-hidden="true">혜</span><span class="gb"><b>지역 정착 지원 혜택</b><small>정주지원금·일학습병행지원금·유지기업 지원금</small></span><span class="ga" aria-hidden="true">→</span></a>' +
         '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>운영 기준·지원금·적용 법령</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+        '<a class="guidecard" href="#/fpstat"><span class="ri" aria-hidden="true">통</span><span class="gb"><b>현장실습 통계(장학사 확인용)</b><small>학교별 참여·유형·기업·취업 전환·지원금 현황</small></span><span class="ga" aria-hidden="true">→</span></a>' +
         '<a class="guidecard" href="#/role/supervisor"><span class="ri" aria-hidden="true">장</span><span class="gb"><b>장학사 업무 안내</b><small>법적 근거, 연간 업무 체크리스트, 지도·점검 질문</small></span><span class="ga" aria-hidden="true">→</span></a>' +
         '<a class="guidecard" href="' + esc(MJG.safeUrl(R.file)) + '" target="_blank" rel="noopener"><span class="ri" aria-hidden="true">원</span><span class="gb"><b>' + R.pub + '년 KEDI 원문</b><small>세부 분석 자료(' + esc(R.fileType || '') + ') 내려받기</small></span><span class="ga" aria-hidden="true">↗</span></a>' +
         '</div></div></section>';
@@ -465,16 +491,28 @@
         '<div class="tile"><span class="tl">취업자</span><span class="tv">' + fmtN(A.emp) + '<small>명</small></span><span class="td">졸업자의 ' + pct(R.netRate) + '(순취업률)</span></div>' +
         '<div class="tile"><span class="tl">300인 이상 사업장 취업</span><span class="tv">' + pct(R.big300) + '</span><span class="td">' + (P ? delta(R.big300, P.big300) + ' 전년 대비' : '보험가입 취업자 중') + '</span></div></div>';
       h += '<ul class="points">' + (R.highlights || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
-      // 우리 지역 카드
-      var rk = G.rank, insidePct = G.ins ? G.inside / G.ins * 100 : null;
-      var rr = (R.ret && R.ret.sido || []).filter(function (x) { return x.sido === G.sido; })[0];
-      h += '<div class="card regioncard"><div class="rch"><h3>우리 지역</h3><label class="sel">지역 <select id="ssRegion">' + R.sido.map(function (x) { return '<option' + (x.sido === G.sido ? ' selected' : '') + '>' + esc(x.sido) + '</option>'; }).join('') + '</select></label></div>' +
-        '<div class="statstrip">' +
-        '<div class="tile"><span class="tl">' + esc(G.sido) + ' 취업률</span><span class="tv">' + pct(G.rate) + '</span><span class="td">17개 시도 중 <b>' + rk + '위</b>' + (GP ? ' (전년 ' + GP.rank + '위)' : '') + '</span></div>' +
-        '<div class="tile"><span class="tl">전국과 차이</span><span class="tv">' + (G.rate >= A.rate ? '+' : '−') + Math.abs(G.rate - A.rate).toFixed(1) + '<small>%p</small></span><span class="td">전국 ' + pct(A.rate) + '</span></div>' +
-        '<div class="tile"><span class="tl">진학률</span><span class="tv">' + pct(G.advRate) + '</span><span class="td">' + delta(G.advRate, GP && GP.advRate) + ' 전년 대비</span></div>' +
-        '<div class="tile"><span class="tl">지역 안 취업 비중</span><span class="tv">' + (insidePct == null ? '–' : insidePct.toFixed(1) + '%') + '</span><span class="td">관내 ' + fmtN(G.inside) + '명 / 보험가입 ' + fmtN(G.ins) + '명</span></div></div>' +
-        '<p class="m0 small">학교유형별 취업률: 특성화고 ' + pct(G.sp) + ' · 마이스터고 ' + pct(G.mt) + ' · 일반고 직업반 ' + pct(G.gv) + (rr ? ' · 1년 유지취업률 ' + pct(rr.rate2) + '(' + esc(R.ret.cohort) + ')' : '') + '</p></div>';
+      // 광주·전남(기본) + 통합 참고 + 선택 시도
+      var GJ = gjjn(R), GJP = P ? gjjn(P) : null;
+      var extra = SS.region && SS.region !== '광주' && SS.region !== '전남' ? sidoOf(R, SS.region) : null, extraP = extra && P ? sidoOf(P, extra.sido) : null;
+      var cols = GJ ? [[GJ.g, GJP && GJP.g, GJ.rg], [GJ.j, GJP && GJP.j, GJ.rj], [GJ.c, GJP && GJP.c, GJ.c.ret2 != null ? { rate2: GJ.c.ret2 } : null]] : [[G, GP, null]];
+      if (extra) cols.push([extra, extraP, (R.ret && R.ret.sido || []).filter(function (x) { return x.sido === extra.sido; })[0]]);
+      var gap = function (v) { return v == null ? '–' : (v >= A.rate ? '+' : '−') + Math.abs(v - A.rate).toFixed(1) + '%p'; };
+      var ROWS = [
+        ['취업률', function (x) { return '<b class="big">' + pct(x[0].rate) + '</b>'; }],
+        ['시도 순위', function (x) { return x[0].rank == null ? '–' : (x[0].nRank ? '<span title="광주·전남을 하나로 보고 16개 시도 중 순위(참고)">' + x[0].rank + '위 / ' + x[0].nRank + '</span>' : x[0].rank + '위') + (x[1] && x[1].rank != null ? '<br><small class="muted">전년 ' + x[1].rank + '위</small>' : ''); }],
+        ['전국 대비', function (x) { return gap(x[0].rate) + '<br><small class="muted">전국 ' + pct(A.rate) + '</small>'; }],
+        ['전년 대비', function (x) { return x[1] ? delta(x[0].rate, x[1].rate) : '–'; }],
+        ['진학률', function (x) { return pct(x[0].advRate); }],
+        ['관내 취업 비중', function (x) { return x[0].ins ? (x[0].inside / x[0].ins * 100).toFixed(1) + '%<br><small class="muted">' + fmtN(x[0].inside) + '/' + fmtN(x[0].ins) + '명</small>' : '–'; }],
+        ['졸업자·취업자', function (x) { return fmtN(x[0].grad) + '명<br><small class="muted">취업 ' + fmtN(x[0].emp) + '명</small>'; }],
+        ['특성화고·마이스터고', function (x) { return x[0].sp == null && x[0].mt == null ? '<small class="muted">통합 산출 안 함</small>' : pct(x[0].sp) + ' · ' + pct(x[0].mt); }],
+        ['1년 유지취업률', function (x) { return x[2] ? pct(x[2].rate2) : '–'; }]
+      ];
+      h += '<div class="card regioncard"><div class="rch"><h3>광주·전남 한눈에</h3><label class="sel">다른 시도 함께 보기 <select id="ssRegion"><option value="">선택 안 함</option>' + R.sido.filter(function (x) { return x.sido !== '광주' && x.sido !== '전남'; }).map(function (x) { return '<option' + (extra && x.sido === extra.sido ? ' selected' : '') + '>' + esc(x.sido) + '</option>'; }).join('') + '</select></label></div>' +
+        '<div class="tablewrap"><table class="dtable gjtable"><thead><tr><th>구분</th>' + cols.map(function (x, i) { return '<th class="n' + (i === 2 && GJ ? ' cb' : '') + '">' + esc(x[0].sido) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        ROWS.map(function (r0) { return '<tr><th scope="row">' + esc(r0[0]) + '</th>' + cols.map(function (x, i) { return '<td class="n' + (i === 2 && GJ ? ' cb' : '') + '">' + r0[1](x) + '</td>'; }).join('') + '</tr>'; }).join('') +
+        '</tbody></table></div>' +
+        '<p class="m0 small muted">‘광주·전남 통합(참고)’은 두 시도 원자료(졸업자·취업자·진학자·입대자·제외인정자)를 합산해 KEDI 산식으로 다시 계산한 참고치이며 KEDI 공식 발표값이 아닙니다. 순위는 광주·전남을 하나로 본 16개 시도 기준, 유지취업률은 보험가입 취업자 수로 가중평균한 값입니다. 학교유형별 통합값은 산출하지 않았습니다.</p></div>';
       h += '</section>';
     }
 
@@ -498,14 +536,14 @@
     /* 3. 시도 */
     if (show('rg')) {
       var mlab = { rate: '취업률', advRate: '진학률', inside: '지역 안(관내) 취업 비중' }[SS.metric];
-      var rows = R.sido.map(function (x) { var v = SS.metric === 'inside' ? (x.ins ? x.inside / x.ins * 100 : null) : x[SS.metric]; return [x.sido, v, x.sido === G.sido || x.sido === '광주' || x.sido === '전남', SS.metric === 'rate' ? x.rank + '위 · 졸업자 ' + fmtN(x.grad) + '명' : '']; })
+      var rows = R.sido.map(function (x) { var v = SS.metric === 'inside' ? (x.ins ? x.inside / x.ins * 100 : null) : x[SS.metric]; return [x.sido, v, x.sido === '광주' || x.sido === '전남' || (GX && x.sido === GX.sido), SS.metric === 'rate' ? x.rank + '위 · 졸업자 ' + fmtN(x.grad) + '명' : '']; })
         .sort(function (a, b) { return (b[1] || 0) - (a[1] || 0); });
       var avg = SS.metric === 'rate' ? A.rate : SS.metric === 'advRate' ? A.advRate : (R.workTotal && R.workTotal.ins ? R.workTotal.in / R.workTotal.ins * 100 : null);
-      h += sectHead('rg', '시도별 비교', '주황 막대는 광주·전남(또는 고른 지역)입니다. 학교가 있는 시도 기준입니다.');
+      h += sectHead('rg', '시도별 비교', '주황 막대는 광주·전남(그리고 함께 보기로 고른 시도)입니다. 학교가 있는 시도 기준입니다.');
       h += '<div class="card chartcard"><div class="rch"><h3>' + R.pub + '년 발표 시도별 ' + esc(mlab) + '</h3><span class="seg" role="group" aria-label="지표">' + [['rate', '취업률'], ['advRate', '진학률'], ['inside', '관내 취업']].map(function (m) { return '<button type="button" data-metric="' + m[0] + '" aria-pressed="' + (SS.metric === m[0]) + '">' + m[1] + '</button>'; }).join('') + '</span></div>' +
         hbar(rows, { label: '시도별 ' + mlab, max: SS.metric === 'inside' ? 100 : 80, avg: avg, avgLabel: '전국', metric: mlab }) +
         table(['시도', '순위', '학교', '졸업자', '취업자', '취업률', '진학률', '특성화고', '마이스터고', '일반고 직업반', '관내 취업'], R.sido.slice().sort(function (a, b) { return a.rank - b.rank; }).map(function (x) {
-          return { em: x.sido === G.sido, c: [esc(x.sido), esc(x.rank), esc(x.schools), fmtN(x.grad), fmtN(x.emp), pct(x.rate), pct(x.advRate), pct(x.sp), pct(x.mt), pct(x.gv), x.ins ? (x.inside / x.ins * 100).toFixed(1) + '%' : '–'] };
+          return { em: x.sido === '광주' || x.sido === '전남' || (GX && x.sido === GX.sido), c: [esc(x.sido), esc(x.rank), esc(x.schools), fmtN(x.grad), fmtN(x.emp), pct(x.rate), pct(x.advRate), pct(x.sp), pct(x.mt), pct(x.gv), x.ins ? (x.inside / x.ins * 100).toFixed(1) + '%' : '–'] };
         }), { title: '시도별 표 보기(학교유형 포함)' }) + '</div>';
       // 지역 추이(학교유형별, 2020~)
       var ST = st.sidoTrend || { years: [], rows: [] };
@@ -514,11 +552,11 @@
       var pick = function (sd, ty) { var r0 = ST.rows.filter(function (x) { return x.sido === sd && x.type === ty; })[0]; return r0 ? r0.vals : ST.years.map(function () { return null; }); };
       var regRates = function (sd) { return ST.years.map(function (y) { var rr0 = (st.releases || []).filter(function (k) { return k.pub === y; })[0]; var s0 = rr0 ? sidoOf(rr0, sd) : null; return s0 ? s0.rate : null; }); };
       var natRates = ST.years.map(function (y) { var t = (st.trend || []).filter(function (k) { return k.pub === y && k.type === '전체'; })[0]; return t ? t.rate : null; });
-      var seriesR = trT === '전체' ? [{ name: '전국', cls: 's1', values: natRates }, { name: G.sido, cls: 's2', values: regRates(G.sido) }].concat(G.sido !== '전남' && G.sido === '광주' ? [{ name: '전남', cls: 's3', values: regRates('전남') }] : G.sido !== '광주' ? [{ name: '광주', cls: 's3', values: regRates('광주') }] : [])
-        : [{ name: '전국', cls: 's1', values: pick('전국', trT) }, { name: G.sido, cls: 's2', values: pick(G.sido, trT) }].concat(G.sido === '광주' ? [{ name: '전남', cls: 's3', values: pick('전남', trT) }] : [{ name: '광주', cls: 's3', values: pick('광주', trT) }]);
-      h += '<div class="card chartcard"><div class="rch"><h3>' + esc(G.sido) + ' 취업률 추이</h3><span class="seg" role="group" aria-label="학교유형">' + ['전체', '특성화고', '마이스터고', '일반고 직업반'].map(function (t) { return '<button type="button" data-ttype="' + t + '" aria-pressed="' + (trT === t) + '">' + (t === '일반고 직업반' ? '일반고' : t) + '</button>'; }).join('') + '</span></div>' +
+      var seriesR = (trT === '전체' ? [{ name: '전국', cls: 's1', values: natRates }, { name: '광주', cls: 's2', values: regRates('광주') }, { name: '전남', cls: 's3', values: regRates('전남') }].concat(GX ? [{ name: GX.sido, cls: 's4', values: regRates(GX.sido) }] : [])
+        : [{ name: '전국', cls: 's1', values: pick('전국', trT) }, { name: '광주', cls: 's2', values: pick('광주', trT) }, { name: '전남', cls: 's3', values: pick('전남', trT) }].concat(GX ? [{ name: GX.sido, cls: 's4', values: pick(GX.sido, trT) }] : []));
+      h += '<div class="card chartcard"><div class="rch"><h3>광주·전남' + (GX ? '·' + esc(GX.sido) : '') + ' 취업률 추이</h3><span class="seg" role="group" aria-label="학교유형">' + ['전체', '특성화고', '마이스터고', '일반고 직업반'].map(function (t) { return '<button type="button" data-ttype="' + t + '" aria-pressed="' + (trT === t) + '">' + (t === '일반고 직업반' ? '일반고' : t) + '</button>'; }).join('') + '</span></div>' +
         '<div class="legend">' + seriesR.map(function (x, i) { return '<span><i class="c' + (i + 1) + '"></i>' + esc(x.name) + '</span>'; }).join('') + '</div>' +
-        lineChart(ST.years.map(String), seriesR, { label: G.sido + ' 취업률 추이', max: trT === '마이스터고' ? 100 : 80, sub: function (i) { return '(' + String(ST.years[i] - 1).slice(2) + '학년도)'; }, tipTitle: function (i) { return ST.years[i] + '년 발표 · ' + (ST.years[i] - 1) + '학년도 3학년'; } }) +
+        lineChart(ST.years.map(String), seriesR, { label: '광주·전남 취업률 추이', max: trT === '마이스터고' ? 100 : 80, sub: function (i) { return '(' + String(ST.years[i] - 1).slice(2) + '학년도)'; }, tipTitle: function (i) { return ST.years[i] + '년 발표 · ' + (ST.years[i] - 1) + '학년도 3학년'; } }) +
         '<p class="cap">' + (trT === '전체' ? '시도 전체 취업률은 2023~2026년 발표자료에 수록된 값만 표시합니다. 학교유형을 고르면 2020년 발표부터 볼 수 있습니다.' : '학교유형별 시도 취업률(각 연도를 담은 가장 최근 발표자료 기준). 학교 수가 적은 유형은 해마다 크게 달라질 수 있습니다.') + '</p></div>';
       h += '</section>';
     }
@@ -563,12 +601,12 @@
         hbar(ind.slice(0, 10).map(function (x) { return [x.name, x.n, false, '남 ' + fmtN(x.m) + ' · 여 ' + fmtN(x.f) + ' · ' + (x.n / tins * 100).toFixed(1) + '%']; }), { label: '업종별 취업자 상위 10', unit: '명', W: Math.min(cw(), 460), metric: '취업자' }) +
         '<p class="cap">상위 10개 업종. 업종이 확인되지 않은 취업자 ' + fmtN(tins - indTot) + '명은 제외했습니다.</p>' +
         table(['업종', '취업자', '남', '여', '비중'], ind.map(function (x) { return { c: [esc(x.name), fmtN(x.n), fmtN(x.m), fmtN(x.f), (x.n / tins * 100).toFixed(1) + '%'] }; }), { title: '전체 업종 표' }) + '</div></div>';
-      if (G && G.ins) {
-        var cap = G.cap / G.ins * 100;
-        h += '<div class="card"><h3 class="m0">' + esc(G.sido) + ' 졸업생은 어디에서 일하나</h3><div class="stackbar" role="img" aria-label="관내 ' + (G.inside / G.ins * 100).toFixed(1) + '%, 관외 ' + (G.outside / G.ins * 100).toFixed(1) + '%"><span class="sb1" data-w="' + (G.inside / G.ins * 100).toFixed(1) + '"></span><span class="sb2" data-w="' + (G.outside / G.ins * 100).toFixed(1) + '"></span></div>' +
-          '<div class="legend"><span><i class="c1"></i>' + esc(G.sido) + ' 안(관내) ' + fmtN(G.inside) + '명 · ' + (G.inside / G.ins * 100).toFixed(1) + '%</span><span><i class="c2"></i>다른 시도(관외) ' + fmtN(G.outside) + '명 · ' + (G.outside / G.ins * 100).toFixed(1) + '%</span></div>' +
+      [sidoOf(R, '광주'), sidoOf(R, '전남'), GX].filter(function (x) { return x && x.ins; }).forEach(function (G1) {
+        var cap = G1.cap / G1.ins * 100;
+        h += '<div class="card"><h3 class="m0">' + esc(G1.sido) + ' 졸업생은 어디에서 일하나</h3><div class="stackbar" role="img" aria-label="관내 ' + (G1.inside / G1.ins * 100).toFixed(1) + '%, 관외 ' + (G1.outside / G1.ins * 100).toFixed(1) + '%"><span class="sb1" data-w="' + (G1.inside / G1.ins * 100).toFixed(1) + '"></span><span class="sb2" data-w="' + (G1.outside / G1.ins * 100).toFixed(1) + '"></span></div>' +
+          '<div class="legend"><span><i class="c1"></i>' + esc(G1.sido) + ' 안(관내) ' + fmtN(G1.inside) + '명 · ' + (G1.inside / G1.ins * 100).toFixed(1) + '%</span><span><i class="c2"></i>다른 시도(관외) ' + fmtN(G1.outside) + '명 · ' + (G1.outside / G1.ins * 100).toFixed(1) + '%</span></div>' +
           '<p class="m0 small">수도권 사업장 취업 ' + cap.toFixed(1) + '% · 전국 평균 관내 취업 ' + (R.workTotal && R.workTotal.ins ? (R.workTotal.in / R.workTotal.ins * 100).toFixed(1) + '%' : '–') + '</p></div>';
-      }
+      });
       h += '</section>';
     }
 
@@ -580,7 +618,7 @@
         groupBar(rt.type.map(function (x) { return { label: x.type === '일반고 직업반' ? '일반고' : x.type, vals: [x.rate1, x.rate2] }; }), [{ name: '6개월', cls: 's1' }, { name: '1년', cls: 's2' }], { label: '학교유형별 유지취업률', max: 100, W: Math.min(cw(), 430), H: 280, labelAll: true }) +
         table(['학교유형', '졸업자', '보험가입 취업자', '6개월 유지', '1년 유지'], rt.type.map(function (x) { return { em: x.type === '전체', c: [esc(x.type), fmtN(x.grad), fmtN(x.ins), pct(x.rate1), pct(x.rate2)] }; })) + '</div>' +
         '<div class="card chartcard"><h3>시도별 1년 유지취업률</h3>' +
-        hbar(rt.sido.slice().sort(function (a, b) { return b.rate2 - a.rate2; }).map(function (x) { return [x.sido, x.rate2, x.sido === G.sido || x.sido === '광주' || x.sido === '전남', '6개월 ' + pct(x.rate1) + ' · 취업자 ' + fmtN(x.ins) + '명']; }), { label: '시도별 1년 유지취업률', max: 100, W: Math.min(cw(), 460), avg: (rt.type.filter(function (x) { return x.type === '전체'; })[0] || {}).rate2, avgLabel: '전국', metric: '1년 유지' }) + '</div></div>';
+        hbar(rt.sido.slice().sort(function (a, b) { return b.rate2 - a.rate2; }).map(function (x) { return [x.sido, x.rate2, x.sido === '광주' || x.sido === '전남' || (GX && x.sido === GX.sido), '6개월 ' + pct(x.rate1) + ' · 취업자 ' + fmtN(x.ins) + '명']; }), { label: '시도별 1년 유지취업률', max: 100, W: Math.min(cw(), 460), avg: (rt.type.filter(function (x) { return x.type === '전체'; })[0] || {}).rate2, avgLabel: '전국', metric: '1년 유지' }) + '</div></div>';
       if ((rt.subject || []).length) h += '<div class="card chartcard"><h3>교과(군)별 유지취업률</h3>' + table(['교과(군)', '이수자', '보험가입 취업자', '6개월 유지', '1년 유지'], rt.subject.slice().sort(function (a, b) { return b.rate2 - a.rate2; }).map(function (x) { return { c: [esc(x.name), fmtN(x.n), fmtN(x.ins), pct(x.rate1), pct(x.rate2)] }; }), { open: SS.lens === 'student' }) + '</div>';
       h += '</section>';
     }
@@ -613,7 +651,7 @@
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); document.execCommand('copy'); done(); });
       else { ta.select(); document.execCommand('copy'); done(); }
     });
-    var rs = el.querySelector('#ssRegion'); if (rs) rs.addEventListener('change', function () { SS.region = rs.value; MJG.store.set('mjg.statRegion', SS.region); redraw(); });
+    var rs = el.querySelector('#ssRegion'); if (rs) rs.addEventListener('change', function () { SS.region = rs.value; MJG.store.set('mjg.statRegion2', SS.region); redraw(); });
     var how = el.querySelector('#ssHow'); if (how) how.addEventListener('click', function () {
       var t = el.querySelector('#ss-df'); if (!t) { SS.lens = 'all'; redraw(); t = el.querySelector('#ss-df'); }
       if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });

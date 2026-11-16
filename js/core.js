@@ -176,7 +176,7 @@
     var h = decodeURIComponent((location.hash || '').replace(/^#\/?/, ''));
     var parts = h.split('/'); return { name: parts[0] || 'home', a: parts[1] || '', b: parts.slice(2).join('/') };
   }
-  var TITLES = { home: '홈', fp: '현장실습 Q&A', res: '취업지원 자료실', resdetail: '자료', role: '대상별 안내', schedule: '주요 일정', stats: '취업통계', center: '취업지원센터', district: '직업교육혁신지구', notices: '공지사항', more: '설치·설정', search: '검색' };
+  var TITLES = { home: '홈', fp: '현장실습 Q&A', res: '취업지원 자료실', resdetail: '자료', role: '대상별 안내', schedule: '주요 일정', stats: '취업통계', center: '취업지원센터', district: '직업교육혁신지구', fpstat: '현장실습 통계', notices: '공지사항', more: '설치·설정', search: '검색' };
   MJG.route = function () {
     if (!MJG.data) return;
     var r = parseHash(), name = r.name;
