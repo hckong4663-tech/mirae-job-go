@@ -1,9 +1,9 @@
 /* 미래 JOB GO 서비스워커 — 오프라인 실행용(같은 출처 요청만 처리, 외부 요청은 관여하지 않음) */
 'use strict';
-var BUILD = '202611161045';
+var BUILD = '202611161048';
 var SHELL_CACHE = 'mjg-shell-' + BUILD;
 var FILE_CACHE = 'mjg-files-v1';
-var SHELL = ["./","index.html","manifest.webmanifest?v=71720f20e2","css/fp.css?v=202611161045","css/app.css?v=202611161045","js/config.js?v=202611161045","data/content.js?v=202611161045","js/core.js?v=202611161045","js/fp-ask.js?v=202611161045","js/fp-ui.js?v=202611161045","js/views.js?v=202611161045","js/chapters.js?v=202611161045","icons/icon-64.png?v=71720f20e2","icons/icon-192.png?v=71720f20e2","icons/icon-512.png?v=71720f20e2","icons/maskable-192.png?v=71720f20e2","icons/maskable-512.png?v=71720f20e2","icons/apple-touch-icon.png?v=71720f20e2","icons/favicon-32.png?v=71720f20e2"];
+var SHELL = ["./","index.html","manifest.webmanifest?v=71720f20e2","css/fp.css?v=202611161048","css/app.css?v=202611161048","js/config.js?v=202611161048","data/content.js?v=202611161048","js/core.js?v=202611161048","js/fp-ask.js?v=202611161048","js/fp-ui.js?v=202611161048","js/views.js?v=202611161048","js/chapters.js?v=202611161048","icons/icon-64.png?v=71720f20e2","icons/icon-192.png?v=71720f20e2","icons/icon-512.png?v=71720f20e2","icons/maskable-192.png?v=71720f20e2","icons/maskable-512.png?v=71720f20e2","icons/apple-touch-icon.png?v=71720f20e2","icons/favicon-32.png?v=71720f20e2"];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(SHELL_CACHE).then(function (c) { return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
@@ -21,7 +21,7 @@ self.addEventListener('fetch', function (e) {
   var p = url.pathname;
   if (/\/data\/content\.json(\.sig)?$/.test(p)) return;          // 업데이트 자료는 항상 서버에서(서명 검증은 앱이 수행)
   if (req.mode === 'navigate') {                                // 화면: 네트워크 우선, 실패 시 저장본
-    e.respondWith(fetch(req).then(function (r) {
+    e.respondWith(fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).then(function (r) {
       var cp = r.clone(); caches.open(SHELL_CACHE).then(function (c) { c.put('index.html', cp); }); return r;
     }).catch(function () { return caches.match('index.html'); }));
     return;
