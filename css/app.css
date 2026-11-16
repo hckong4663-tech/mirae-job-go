@@ -403,3 +403,5 @@ textarea.brief{width:100%;box-sizing:border-box;font:inherit;font-size:.92rem;li
 .statstrip.s5{grid-template-columns:repeat(5,1fr)}
 @media (max-width:1100px){.statstrip.s5{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:640px){.statstrip.s5{grid-template-columns:repeat(2,1fr)}.statstrip.s5 .tile:last-child{grid-column:1/-1}}
+.rolecard{flex-direction:row;align-items:center;gap:10px;padding:12px 14px;min-height:60px}
+.rolecard .ri{flex:none}

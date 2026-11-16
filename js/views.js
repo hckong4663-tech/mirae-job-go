@@ -53,10 +53,10 @@
     var quick = (window.FP.QUICK || []).slice(0, 6).map(qaById).filter(Boolean);
     var diff = pv && nat.rate != null ? (nat.rate - pv.rate) : null;
     el.innerHTML =
-      '<div class="hero"><h1>미래로 가는 첫 직장,<br>미래 JOB GO</h1><p>' + esc(d.meta.summary) + '</p>' +
+      '<div class="hero"><h1>미래로 가는 첫 직장,<br>미래 JOB GO</h1>' +
       '<form class="hsearch" id="hsearch" role="search"><input id="hq" type="search" placeholder="무엇이든 찾아보세요: 순회지도, 수당, 장려금" aria-label="통합 검색" enterkeyhint="search"><button type="submit">검색</button></form></div>' +
       '<div class="sect"><h2>누구를 위한 안내가 필요하세요?</h2><div class="roles">' +
-      d.roles.map(function (r) { return '<a class="rolecard" href="#/role/' + esc(r.key) + '"><span class="ri" aria-hidden="true">' + (ROLE_INI[r.key] || '') + '</span><b>' + esc(r.name) + '</b><span>' + esc(r.lead).slice(0, 46) + '…</span></a>'; }).join('') +
+      d.roles.map(function (r) { return '<a class="rolecard" href="#/role/' + esc(r.key) + '"><span class="ri" aria-hidden="true">' + (ROLE_INI[r.key] || '') + '</span><b>' + esc(r.name) + '</b></a>'; }).join('') +
       '</div></div>' +
       '<div class="sect"><h2>취업 지원 한곳에서</h2><div class="guidegrid2">' +
       '<a class="guidecard" href="#/center"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터</b><small>지원 사업, 13개 직업계고 학과·연락처, 취업 후 혜택</small></span><span class="ga" aria-hidden="true">→</span></a>' +
@@ -126,7 +126,7 @@
     var lk = D().links.filter(function (l) { return (l.roles || []).indexOf(ro.key) >= 0; });
     el.innerHTML =
       '<div class="rolehead"><nav class="rtabs" aria-label="대상 선택">' + roles.map(function (x) { return '<a href="#/role/' + esc(x.key) + '"' + (x.key === ro.key ? ' aria-current="page"' : '') + '>' + esc(x.name) + '</a>'; }).join('') + '</nav>' +
-      '<h1 class="vt">' + esc(ro.name) + ' 취업지원 안내</h1><p class="rlead">' + esc(ro.lead) + '</p>' +
+      '<h1 class="vt">' + esc(ro.name) + '</h1>' +
       '<form class="rsearch" id="rsearch" role="search"><input class="finput" id="rsq" type="search" placeholder="' + esc(ro.name) + ' 자료 검색(예: 협약, 수당, 산재)" aria-label="' + esc(ro.name) + ' 자료 검색" enterkeyhint="search"><button type="submit">검색</button></form></div>' +
       '<p class="hitnote" id="hitnote" hidden></p>' +
       '<div class="sect"><h2>꼭 알아둘 기준</h2><dl class="facts">' + (ro.keyfacts || []).map(function (f) { return '<dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('') + '</dl></div>' +
@@ -194,7 +194,7 @@
       var g = '';
       if (resState.role && shown[0]) {
         var ro = shown[0];
-        g = '<a class="guidecard" href="#/role/' + esc(ro.key) + qs + '"><span class="ri" aria-hidden="true">' + (ROLE_INI[ro.key] || '') + '</span><span class="gb"><b>' + esc(ro.name) + ' 취업지원 안내 바로가기</b><small>' + esc(ro.lead) + '</small><small class="gm">꼭 알아둘 기준 ' + (ro.keyfacts || []).length + '개 · 단계별 체크리스트 ' + (ro.phases || []).length + '단계 · 관련 일정·통계</small></span><span class="ga" aria-hidden="true">→</span></a>';
+        g = '<a class="guidecard" href="#/role/' + esc(ro.key) + qs + '"><span class="ri" aria-hidden="true">' + (ROLE_INI[ro.key] || '') + '</span><span class="gb"><b>' + esc(ro.name) + ' 바로가기</b><small class="gm">꼭 알아둘 기준 ' + (ro.keyfacts || []).length + '개 · 단계별 체크리스트 ' + (ro.phases || []).length + '단계 · 관련 일정·통계</small></span><span class="ga" aria-hidden="true">→</span></a>';
       } else if (!q) {
         g = '<div class="sect"><h2>대상별 안내 바로가기</h2><div class="guidegrid">' + roles.map(function (r0) { return '<a class="guidemini" href="#/role/' + esc(r0.key) + '"><span class="ri" aria-hidden="true">' + (ROLE_INI[r0.key] || '') + '</span><b>' + esc(r0.name) + '</b><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div></div>';
       }
