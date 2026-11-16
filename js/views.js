@@ -3,8 +3,8 @@
 (function () {
   'use strict';
   var MJG = window.MJG, V = MJG.views, esc = MJG.esc;
-  var ROLE = { student: '학생', teacher: '교사', jobcoach: '취업지원관', school: '학교', company: '기업체' };
-  var ROLE_INI = { student: '학', teacher: '교', jobcoach: '취', school: '관', company: '기' };
+  var ROLE = { student: '학생', teacher: '교사', jobcoach: '취업지원관', school: '학교', company: '기업체', supervisor: '장학사' };
+  var ROLE_INI = { student: '학', teacher: '교', jobcoach: '취', school: '관', company: '기', supervisor: '장' };
 
   function D() { return MJG.data; }
   function qaById(id) { var q = window.QA || []; for (var i = 0; i < q.length; i++) if (q[i].id === id) return { x: q[i], no: i + 1 }; return null; }
@@ -130,7 +130,8 @@
       '<form class="rsearch" id="rsearch" role="search"><input class="finput" id="rsq" type="search" placeholder="' + esc(ro.name) + ' 자료 검색(예: 협약, 수당, 산재)" aria-label="' + esc(ro.name) + ' 자료 검색" enterkeyhint="search"><button type="submit">검색</button></form></div>' +
       '<p class="hitnote" id="hitnote" hidden></p>' +
       '<div class="sect"><h2>꼭 알아둘 기준</h2><dl class="facts">' + (ro.keyfacts || []).map(function (f) { return '<dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('') + '</dl></div>' +
-      '<a class="statlink" href="#/stats" id="toStats"><span><b>' + esc(ro.name) + '에게 필요한 취업통계 보기</b><small>' + esc({ student: '내 계열 취업률, 선배들이 취업한 회사 규모·업종, 취업 유지율', teacher: '광주·전남과 전국 비교, 학교유형·계열별 취업률, 유지취업률', jobcoach: '시도·계열별 취업률, 업종·규모별 취업처, 관내·관외 취업', school: '시도 순위, 학교유형·설립주체별 비교, 연도별 추이', company: '업종·사업장 규모별 취업자, 계열별 배출 인원' }[ro.key] || '') + '</small></span><span aria-hidden="true">→</span></a>' +
+      '<a class="statlink" href="#/stats" id="toStats"><span><b>' + esc(ro.name) + '에게 필요한 취업통계 보기</b><small>' + esc({ student: '내 계열 취업률, 선배들이 취업한 회사 규모·업종, 취업 유지율', teacher: '광주·전남과 전국 비교, 학교유형·계열별 취업률, 유지취업률', jobcoach: '시도·계열별 취업률, 업종·규모별 취업처, 관내·관외 취업', school: '시도 순위, 학교유형·설립주체별 비교, 연도별 추이', company: '업종·사업장 규모별 취업자, 계열별 배출 인원', supervisor: '우리 지역 4개년 추이·시도 순위, 보고용 요약 문장(개조식), 연계 사업 바로가기' }[ro.key] || '') + '</small></span><span aria-hidden="true">→</span></a>' +
+      '<div class="sect"><h2>함께 보면 좋은 메뉴</h2><div class="guidegrid2">' + [['#/center', '센', '취업지원센터', '지원 사업·13개교 학과 현황·취업 후 혜택'], ['#/district', '혁', '빛고을 직업교육혁신지구', '취업동아리 현황·지역대학 연계·정주지원금'], ['#/fp/leaf', '실', '현장실습 리플릿 요약', '운영 기준·지원금·적용 법령']].map(function (m) { return '<a class="guidecard" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><span class="gb"><b>' + m[2] + '</b><small>' + m[3] + '</small></span><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>단계별 체크리스트 <button type="button" class="ghost" id="ckreset">체크 초기화</button></h2><p class="muted m0" id="ckhint"></p><div class="phases">' +
       (ro.phases || []).map(function (ph, pi) {
         var done = 0; (ph.items || []).forEach(function (it, ii) { if (saved[pi + '-' + ii]) done++; });
@@ -151,7 +152,7 @@
         el.querySelector('[data-pc="' + pi + '"]').textContent = dn + '/' + ph.items.length;
       });
     });
-    el.querySelector('#toStats').addEventListener('click', function () { SS.lens = { student: 'student', teacher: 'teacher', jobcoach: 'teacher', school: 'teacher', company: 'company' }[ro.key] || 'all'; MJG.store.set('mjg.statLens', SS.lens); });
+    el.querySelector('#toStats').addEventListener('click', function () { SS.lens = { student: 'student', teacher: 'teacher', jobcoach: 'teacher', school: 'teacher', company: 'company', supervisor: 'sup' }[ro.key] || 'all'; MJG.store.set('mjg.statLens', SS.lens); });
     el.querySelector('#ckreset').addEventListener('click', function () { MJG.store.del(ck); MJG._keepScroll = true; V.role(el, r); });
     el.querySelector('#toRes').addEventListener('click', function () { resState.role = ro.key; resState.cat = ''; resState.q = ''; });
     el.querySelector('#rsearch').addEventListener('submit', function (e) { e.preventDefault(); var v = el.querySelector('#rsq').value.trim(); resState.role = ro.key; resState.cat = ''; resState.q = v; MJG.go('#/res'); });
@@ -373,22 +374,24 @@
   }
   /* ───────── 취업통계(KEDI 2023~2026 발표) ───────── */
   var SS = { pub: null, lens: null, region: null, metric: 'rate', subjSort: 'rate', trendType: '전체' };
-  var LENS = [['all', '전체 보기'], ['student', '학생'], ['teacher', '교사·취업지원관'], ['company', '기업체']];
+  var LENS = [['all', '전체 보기'], ['student', '학생'], ['teacher', '교사·취업지원관'], ['company', '기업체'], ['sup', '장학사']];
   var SEC = [
-    ['ov', '한눈에', ['all', 'student', 'teacher', 'company']],
-    ['tr', '연도별 추이', ['all', 'teacher']],
-    ['rg', '시도·우리 지역', ['all', 'teacher', 'company']],
-    ['ty', '학교유형·성별', ['all', 'student', 'teacher']],
-    ['sj', '계열(교과군)별', ['all', 'student', 'teacher', 'company']],
-    ['wp', '어디에 취업했나', ['all', 'student', 'teacher', 'company']],
-    ['rt', '취업 유지', ['all', 'student', 'teacher', 'company']],
-    ['df', '용어·출처', ['all', 'student', 'teacher', 'company']]
+    ['pol', '정책 브리핑', ['sup']],
+    ['ov', '한눈에', ['all', 'student', 'teacher', 'company', 'sup']],
+    ['tr', '연도별 추이', ['all', 'teacher', 'sup']],
+    ['rg', '시도·우리 지역', ['all', 'teacher', 'company', 'sup']],
+    ['ty', '학교유형·성별', ['all', 'student', 'teacher', 'sup']],
+    ['sj', '계열(교과군)별', ['all', 'student', 'teacher', 'company', 'sup']],
+    ['wp', '어디에 취업했나', ['all', 'student', 'teacher', 'company', 'sup']],
+    ['rt', '취업 유지', ['all', 'student', 'teacher', 'company', 'sup']],
+    ['df', '용어·출처', ['all', 'student', 'teacher', 'company', 'sup']]
   ];
   var LENS_TIP = {
     all: '모든 통계를 순서대로 봅니다.',
     student: '내 계열의 취업률, 졸업 선배들이 취업한 회사 규모·업종, 취업 후 얼마나 오래 다니는지를 중심으로 보여 줍니다.',
     teacher: '광주·전남과 전국 비교, 시도 순위, 학교유형·성별, 관내·관외 취업, 유지취업률 등 진로지도·취업지원에 필요한 통계를 보여 줍니다.',
-    company: '직업계고 졸업생이 어떤 업종·규모의 사업장에 취업하는지, 계열별로 몇 명이 배출되는지를 보여 줍니다.'
+    company: '직업계고 졸업생이 어떤 업종·규모의 사업장에 취업하는지, 계열별로 몇 명이 배출되는지를 보여 줍니다.',
+    sup: '정책 수립·보고에 필요한 우리 지역 4개년 추이와 보고용 요약 문장, 취업지원센터·혁신지구 사업 연계를 먼저 보여 주고, 이어서 모든 통계를 순서대로 보여 줍니다.'
   };
   function rel() { var r = D().stats.releases || []; var x = null; r.forEach(function (k) { if (k.pub === SS.pub) x = k; }); return x || r[0]; }
   function relPrev(R) { var x = null; (D().stats.releases || []).forEach(function (k) { if (k.pub === R.pub - 1) x = k; }); return x; }
@@ -422,6 +425,36 @@
       '<div class="btnrow"><a class="btn sm line" href="' + esc(MJG.safeUrl(R.file)) + '" target="_blank" rel="noopener">원문 보기(' + esc(R.fileType || '') + ')</a><button type="button" class="btn sm line" id="ssHow">발표연도와 학년도 읽는 법</button></div></div>' +
       '<p class="lenstip">' + esc(LENS_TIP[SS.lens]) + '</p>' +
       '<nav class="secnav" aria-label="통계 바로가기">' + SEC.filter(function (x) { return x[2].indexOf(SS.lens) >= 0; }).map(function (x) { return '<button type="button" class="fchip" data-go="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</nav>';
+
+    /* 0. 장학사: 정책 브리핑 */
+    if (show('pol')) {
+      var AP = function (r) { return (r.national || []).filter(function (x) { return x.type === '전체'; })[0] || {}; };
+      var rows4 = rels.slice().sort(function (a, b) { return b.pub - a.pub; }).map(function (r) {
+        var g = sidoOf(r, G.sido) || {}, a = AP(r);
+        return { pub: r.pub, cohort: r.cohort, rate: g.rate, rank: g.rank, nat: a.rate, gap: g.rate != null && a.rate != null ? g.rate - a.rate : null, adv: g.advRate, ins: g.ins ? g.inside / g.ins * 100 : null };
+      });
+      var sgn = function (v) { return v == null ? '–' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + '%p'; };
+      var rrP = (R.ret && R.ret.sido || []).filter(function (x) { return x.sido === G.sido; })[0];
+      var brief = '○ ' + R.pub + '년 KEDI 직업계고 졸업자 취업통계(' + R.releasedAt + ' 발표, 대상: ' + R.cohort + '·' + R.gradLabel + ')\n' +
+        ' - ' + G.sido + ' 직업계고 취업률 ' + pct(G.rate) + '(전국 ' + pct(A.rate) + ', ' + sgn(G.rate - A.rate) + '), 17개 시도 중 ' + G.rank + '위' + (GP ? '(전년 ' + GP.rank + '위)' : '') + '\n' +
+        ' - 진학률 ' + pct(G.advRate) + ', 지역 안(관내) 취업 비중 ' + (G.ins ? (G.inside / G.ins * 100).toFixed(1) + '%' : '–') + '(관내 ' + fmtN(G.inside) + '명/보험가입 취업자 ' + fmtN(G.ins) + '명)\n' +
+        ' - 학교유형별 취업률: 특성화고 ' + pct(G.sp) + ', 마이스터고 ' + pct(G.mt) + ', 일반고 직업반 ' + pct(G.gv) + '\n' +
+        (rrP ? ' - 1년 유지취업률 ' + pct(rrP.rate2) + '(' + R.ret.cohort + ' 기준)\n' : '') +
+        ' ※ 발표연도와 대상 학년도 구분: ' + R.pub + '년 발표 = ' + R.cohort;
+      h += sectHead('pol', '정책 브리핑(' + esc(G.sido) + ')', '보고서·예상질의답변서에 바로 쓸 수 있도록 정리했습니다. 아래 ‘한눈에 보기 → 우리 지역’에서 다른 시도를 고르면 그 시도 기준으로 바뀝니다.');
+      h += '<div class="card"><h3>보고용 요약 문장 <button type="button" class="btn sm line" id="ssCopy">복사</button></h3><textarea class="brief" id="ssBrief" readonly rows="7" aria-label="보고용 요약 문장">' + esc(brief) + '</textarea><p class="m0 small muted">개조식(○, -) 형식입니다. 한글 문서에 붙여 넣은 뒤 표준 양식에 맞춰 다듬으세요.</p></div>';
+      h += '<div class="card"><h3>' + esc(G.sido) + ' 4개년 추이 <span class="muted small">(발표연도 기준, 괄호는 대상 학년도)</span></h3><div class="tablewrap"><table class="dtable"><thead><tr><th>발표(대상)</th><th class="n">취업률</th><th class="n">순위</th><th class="n">전국</th><th class="n">전국 대비</th><th class="n">진학률</th><th class="n">관내 취업</th></tr></thead><tbody>' +
+        rows4.map(function (x) { return '<tr' + (x.pub === R.pub ? ' class="em"' : '') + '><td>' + x.pub + '년 발표<br><small class="muted">' + esc(x.cohort) + '</small></td><td class="n">' + pct(x.rate) + '</td><td class="n">' + (x.rank == null ? '–' : esc(String(x.rank)) + '위') + '</td><td class="n">' + pct(x.nat) + '</td><td class="n">' + sgn(x.gap) + '</td><td class="n">' + pct(x.adv) + '</td><td class="n">' + (x.ins == null ? '–' : x.ins.toFixed(1) + '%') + '</td></tr>'; }).join('') +
+        '</tbody></table></div></div>';
+      h += '<div class="card"><h3>연계 사업·자료 바로가기</h3><div class="guidegrid2">' +
+        '<a class="guidecard" href="#/center/programs"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터 지원 사업</b><small>역량 강화·공공기관 면접·채용연계형 직무교육, 13개교 학과 현황</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+        '<a class="guidecard" href="#/district/clubs"><span class="ri" aria-hidden="true">혁</span><span class="gb"><b>혁신지구 취업동아리 현황</b><small>40팀 580명, 학교·계열 검색 시 합계 자동 계산</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+        '<a class="guidecard" href="#/district/benefit"><span class="ri" aria-hidden="true">혜</span><span class="gb"><b>지역 정착 지원 혜택</b><small>정주지원금·일학습병행지원금·유지기업 지원금</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+        '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>운영 기준·지원금·적용 법령</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+        '<a class="guidecard" href="#/role/supervisor"><span class="ri" aria-hidden="true">장</span><span class="gb"><b>장학사 업무 안내</b><small>법적 근거, 연간 업무 체크리스트, 지도·점검 질문</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+        '<a class="guidecard" href="' + esc(MJG.safeUrl(R.file)) + '" target="_blank" rel="noopener"><span class="ri" aria-hidden="true">원</span><span class="gb"><b>' + R.pub + '년 KEDI 원문</b><small>세부 분석 자료(' + esc(R.fileType || '') + ') 내려받기</small></span><span class="ga" aria-hidden="true">↗</span></a>' +
+        '</div></div></section>';
+    }
 
     /* 1. 한눈에 */
     if (show('ov')) {
@@ -575,6 +608,11 @@
     el.querySelectorAll('[data-ssort]').forEach(function (b) { b.addEventListener('click', function () { SS.subjSort = b.getAttribute('data-ssort'); redraw(); }); });
     el.querySelectorAll('[data-ttype]').forEach(function (b) { b.addEventListener('click', function () { SS.trendType = b.getAttribute('data-ttype'); redraw(); }); });
     el.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { var t = el.querySelector('#ss-' + b.getAttribute('data-go')); if (t) { var top = t.getBoundingClientRect().top + window.scrollY - (document.querySelector('.appbar').offsetHeight + el.querySelector('.stickybar').offsetHeight + 8); window.scrollTo({ top: top, behavior: 'smooth' }); } }); });
+    var cp = el.querySelector('#ssCopy'); if (cp) cp.addEventListener('click', function () {
+      var ta = el.querySelector('#ssBrief'), done = function () { cp.textContent = '복사됨'; setTimeout(function () { cp.textContent = '복사'; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); document.execCommand('copy'); done(); });
+      else { ta.select(); document.execCommand('copy'); done(); }
+    });
     var rs = el.querySelector('#ssRegion'); if (rs) rs.addEventListener('change', function () { SS.region = rs.value; MJG.store.set('mjg.statRegion', SS.region); redraw(); });
     var how = el.querySelector('#ssHow'); if (how) how.addEventListener('click', function () {
       var t = el.querySelector('#ss-df'); if (!t) { SS.lens = 'all'; redraw(); t = el.querySelector('#ss-df'); }

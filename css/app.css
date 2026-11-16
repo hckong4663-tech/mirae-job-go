@@ -381,3 +381,15 @@ svg.chart text.xsub{font-size:10.5px;fill:var(--law)}
 .cflow li:not(:last-child)::after{flex:none}
 .tscroll{contain:inline-size}
 #p-leaf > *{min-width:0}
+.roles{grid-template-columns:repeat(6,1fr)}
+@media (max-width:980px){.roles{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:520px){.roles{grid-template-columns:repeat(2,1fr)}}
+.guidegrid{grid-template-columns:repeat(6,1fr)}
+@media (max-width:980px){.guidegrid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:520px){.guidegrid{grid-template-columns:repeat(2,1fr)}}
+.moremenu.guidegrid{grid-template-columns:repeat(3,1fr)}
+@media (max-width:520px){.moremenu.guidegrid{grid-template-columns:repeat(2,1fr)}}
+textarea.brief{width:100%;box-sizing:border-box;font:inherit;font-size:.92rem;line-height:1.65;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.card h3 .btn.sm{margin-left:8px;vertical-align:middle}
+.stickybar .lens{flex-wrap:wrap;overflow:visible}
+@media (max-width:520px){.stickybar .lens .fchip{min-height:36px;padding:0 12px;font-size:.86rem}}
