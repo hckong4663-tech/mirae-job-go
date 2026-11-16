@@ -16,14 +16,15 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="css/fp.css?v=202611150249">
-<link rel="stylesheet" href="css/app.css?v=202611150249">
-<script src="js/config.js?v=202611150249" defer></script>
-<script src="data/content.js?v=202611150249" defer></script>
-<script src="js/core.js?v=202611150249" defer></script>
-<script src="js/fp-ask.js?v=202611150249" defer></script>
-<script src="js/fp-ui.js?v=202611150249" defer></script>
-<script src="js/views.js?v=202611150249" defer></script>
+<link rel="stylesheet" href="css/fp.css?v=202611160134">
+<link rel="stylesheet" href="css/app.css?v=202611160134">
+<script src="js/config.js?v=202611160134" defer></script>
+<script src="data/content.js?v=202611160134" defer></script>
+<script src="js/core.js?v=202611160134" defer></script>
+<script src="js/fp-ask.js?v=202611160134" defer></script>
+<script src="js/fp-ui.js?v=202611160134" defer></script>
+<script src="js/views.js?v=202611160134" defer></script>
+<script src="js/chapters.js?v=202611160134" defer></script>
 </head>
 <body>
 <a class="skip" href="#view">본문 바로가기</a>
@@ -51,6 +52,8 @@
     <a href="#/role/school" data-nav="role-school" class="sub">학교</a>
     <a href="#/role/company" data-nav="role-company" class="sub">기업체</a>
     <div class="navgroup">정보</div>
+    <a href="#/center" data-nav="center"><span class="ni ni-center" aria-hidden="true"></span>취업지원센터</a>
+    <a href="#/district" data-nav="district"><span class="ni ni-district" aria-hidden="true"></span>직업교육혁신지구</a>
     <a href="#/schedule" data-nav="schedule"><span class="ni ni-cal" aria-hidden="true"></span>주요 일정</a>
     <a href="#/stats" data-nav="stats"><span class="ni ni-stat" aria-hidden="true"></span>취업통계(KEDI)</a>
     <a href="#/notices" data-nav="notices"><span class="ni ni-bell" aria-hidden="true"></span>공지사항</a>
@@ -65,6 +68,8 @@
     <section class="view" data-view="role" hidden></section>
     <section class="view" data-view="res" hidden></section>
     <section class="view" data-view="resdetail" hidden></section>
+    <section class="view" data-view="center" hidden></section>
+    <section class="view" data-view="district" hidden></section>
     <section class="view" data-view="schedule" hidden></section>
     <section class="view" data-view="stats" hidden></section>
     <section class="view" data-view="notices" hidden></section>
@@ -84,6 +89,7 @@
             <a class="tab" href="#/fp/calc" role="tab" data-tab="calc" aria-selected="false">계산기</a>
             <a class="tab" href="#/fp/laws" role="tab" data-tab="laws" aria-selected="false">근거 법령</a>
             <a class="tab" href="#/fp/forms" role="tab" data-tab="forms" aria-selected="false">서식 찾기</a>
+            <a class="tab" href="#/fp/leaf" role="tab" data-tab="leaf" aria-selected="false">리플릿 요약</a>
           </nav>
         </div>
       </div>
@@ -159,6 +165,7 @@
 <div class="fgrid" id="forms"></div>
 </section>
 
+        <section id="p-leaf" role="tabpanel" hidden></section>
       </div>
     </section>
   </main>

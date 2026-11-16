@@ -58,6 +58,10 @@
       '<div class="sect"><h2>누구를 위한 안내가 필요하세요?</h2><div class="roles">' +
       d.roles.map(function (r) { return '<a class="rolecard" href="#/role/' + esc(r.key) + '"><span class="ri" aria-hidden="true">' + (ROLE_INI[r.key] || '') + '</span><b>' + esc(r.name) + '</b><span>' + esc(r.lead).slice(0, 46) + '…</span></a>'; }).join('') +
       '</div></div>' +
+      '<div class="sect"><h2>취업 지원 한곳에서</h2><div class="guidegrid2">' +
+      '<a class="guidecard" href="#/center"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터</b><small>지원 사업, 13개 직업계고 학과·연락처, 취업 후 혜택</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+      '<a class="guidecard" href="#/district"><span class="ri" aria-hidden="true">혁</span><span class="gb"><b>빛고을 직업교육혁신지구</b><small>취업동아리 40팀 현황, 지역대학 연계, 정주·일학습병행지원금</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+      '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>공통매뉴얼 리플릿(기업용·학교용) 핵심 정리</small></span><span class="ga" aria-hidden="true">→</span></a></div></div>' +
       '<div class="sect"><h2>공지사항 <a href="#/notices">전체 보기</a></h2><div class="list">' +
       pins.map(function (n) { return '<a class="li" href="#/notices/' + esc(n.id) + '"><span class="ld">' + esc(MJG.fmtDate(n.date)) + '</span><span class="lb"><b>' + (n.pin ? '<span class="pin">고정</span>' : '') + esc(n.title) + '</b></span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>다가오는 일정 <a href="#/schedule">전체 일정</a></h2>' + schedHtml(up) + '</div>' +
@@ -83,7 +87,7 @@
     var inp = el.querySelector('#sq'), out = el.querySelector('#sout');
     function run(v) {
       var toks = v.trim().split(/\s+/).map(norm).filter(function (t) { return t.length >= 1; });
-      if (!toks.length) { out.innerHTML = '<p class="muted">현장실습 Q&amp;A, 자료실, 공지, 일정, 대상별 안내를 한꺼번에 찾습니다.</p>'; return; }
+      if (!toks.length) { out.innerHTML = '<p class="muted">현장실습 Q&amp;A, 자료실, 공지, 일정, 대상별 안내, 취업지원센터, 직업교육혁신지구를 한꺼번에 찾습니다.</p>'; return; }
       function hit(text) { var n = norm(text); return toks.every(function (t) { return n.indexOf(t) >= 0; }); }
       var groups = [];
       var qa = (window.QA || []).map(function (x, i) { return { x: x, no: i + 1 }; }).filter(function (o) { return hit(o.x.q + ' ' + o.x.a + ' ' + (o.x.k || []).join(' ')); });
@@ -100,6 +104,8 @@
         (ro.phases || []).forEach(function (ph) { (ph.items || []).forEach(function (it) { if (hit(it)) rl.push('<a href="#/role/' + esc(ro.key) + '/' + encodeURIComponent(v.trim()) + '"><span class="k">' + esc(ro.name) + '</span><span>' + esc(it) + '</span></a>'); }); });
       });
       if (rl.length) groups.push(['대상별 안내', rl.slice(0, 20)]);
+      var chs = MJG.chapterHits ? MJG.chapterHits(v) : [];
+      if (chs.length) groups.push(['취업지원센터·혁신지구·리플릿', chs]);
       out.innerHTML = groups.length ? groups.map(function (g) { return '<div class="sect"><h2>' + esc(g[0]) + ' <span class="muted">' + g[1].length + '건</span></h2><div class="sres">' + g[1].join('') + '</div></div>'; }).join('') +
         '<p class="muted">문장으로 물어보려면 <a href="#/fp/ask">현장실습 질문하기</a>를 이용하세요.</p>'
         : '<p class="muted">찾는 내용이 없습니다. 다른 낱말로 검색하거나 <a href="#/fp/ask">현장실습 질문하기</a>에 문장으로 물어보세요.</p>';
@@ -201,6 +207,8 @@
         });
         var qa = (window.QA || []).filter(function (x) { return hit(x.q + ' ' + x.a + ' ' + (x.k || []).join(' ')); });
         h += '<div class="sect"><h2>대상별 안내 <span class="muted">' + rl.length + '건</span></h2>' + (rl.length ? '<div class="sres">' + rl.slice(0, 12).join('') + '</div>' + (rl.length > 12 ? '<p class="muted">' + (rl.length - 12) + '건이 더 있습니다. 대상을 골라 범위를 좁혀 보세요.</p>' : '') : '<p class="muted m0">대상별 안내에는 ‘' + esc(q) + '’ 관련 항목이 없습니다.</p>') + '</div>';
+        var chs = MJG.chapterHits ? MJG.chapterHits(q) : [];
+        if (chs.length) h += '<div class="sect"><h2>취업지원센터·혁신지구·리플릿 <span class="muted">' + chs.length + '건</span></h2><div class="sres">' + chs.join('') + '</div></div>';
         h += '<div class="sect"><h2>현장실습 Q&amp;A</h2><a class="askcard" href="#/fp/ask/' + encodeURIComponent(q) + '"><span><b>‘' + esc(q) + '’ 현장실습 질문하기로 물어보기</b><small>' + (qa.length ? '관련 답변이 있습니다. ' : '') + '매뉴얼 쪽수와 법령 근거를 붙여 답합니다.</small></span><span class="ga" aria-hidden="true">→</span></a></div>';
       }
       el.querySelector('#rhits').innerHTML = h;
@@ -246,7 +254,7 @@
       '<div class="card"><p class="m0" id="rsum"></p></div>' +
       ((x.points || []).length ? '<div class="sect"><h2>핵심 내용</h2><ul class="points">' + x.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>' : '') +
       (x.note ? '<p class="notebox">' + esc(x.note) + '</p>' : '') +
-      ((x.links || []).length ? '<div class="sect"><h2>바로가기</h2><div class="linklist">' + x.links.map(function (l) { var u = MJG.safeUrl(l.url); return u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer"><span>' + esc(l.title) + '</span></a>' : ''; }).join('') + '</div></div>' : '');
+      ((x.links || []).length ? '<div class="sect"><h2>바로가기</h2><div class="linklist">' + x.links.map(function (l) { var u = MJG.safeUrl(l.url); return u ? '<a href="' + esc(u) + '"' + (u.charAt(0) === '#' ? '' : ' target="_blank" rel="noopener noreferrer"') + '><span>' + esc(l.title) + '</span></a>' : ''; }).join('') + '</div></div>' : '');
     el.querySelector('#rsum').textContent = x.summary;
   };
 
@@ -585,7 +593,8 @@
       ['ios', '아이폰·아이패드', ['사파리로 앱 주소에 접속합니다.', '아래쪽 공유 버튼(□↑)을 누릅니다.', '‘홈 화면에 추가’ → ‘추가’를 누르면 아이콘이 생깁니다.']]
     ];
     var lastc = MJG.store.get('mjg.lastcheck');
-    el.innerHTML = '<h1 class="vt">설치·설정·앱 정보</h1>' +
+    el.innerHTML = '<h1 class="vt">더보기</h1><div class="guidegrid moremenu">' + [['#/center', '센', '취업지원센터'], ['#/district', '혁', '직업교육혁신지구'], ['#/fp/leaf', '실', '현장실습 리플릿 요약'], ['#/schedule', '일', '주요 일정'], ['#/notices', '공', '공지사항'], ['#/search', '검', '통합 검색']].map(function (m) { return '<a class="guidemini" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><b>' + m[2] + '</b><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div>' +
+      '<h2 class="vt2">설치·설정·앱 정보</h2>' +
       '<div class="card sect"><h2>앱 설치(무료)</h2>' +
       (MJG.standalone() ? '<p class="ok">✓ 지금 설치된 앱으로 실행 중입니다.</p>' :
         (MJG.installEvt ? '<div class="btnrow"><button type="button" class="btn" id="btnInstall">이 기기에 설치하기</button></div>' : '') +
