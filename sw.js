@@ -1,9 +1,9 @@
 /* 미래 JOB GO 서비스워커 — 오프라인 실행용(같은 출처 요청만 처리, 외부 요청은 관여하지 않음) */
 'use strict';
-var BUILD = '202611161009';
+var BUILD = '202611161019';
 var SHELL_CACHE = 'mjg-shell-' + BUILD;
 var FILE_CACHE = 'mjg-files-v1';
-var SHELL = ["./","index.html","manifest.webmanifest","css/fp.css?v=202611161009","css/app.css?v=202611161009","js/config.js?v=202611161009","data/content.js?v=202611161009","js/core.js?v=202611161009","js/fp-ask.js?v=202611161009","js/fp-ui.js?v=202611161009","js/views.js?v=202611161009","js/chapters.js?v=202611161009","icons/icon-64.png","icons/icon-192.png","icons/icon-512.png","icons/maskable-192.png","icons/maskable-512.png","icons/apple-touch-icon.png","icons/favicon-32.png"];
+var SHELL = ["./","index.html","manifest.webmanifest","css/fp.css?v=202611161019","css/app.css?v=202611161019","js/config.js?v=202611161019","data/content.js?v=202611161019","js/core.js?v=202611161019","js/fp-ask.js?v=202611161019","js/fp-ui.js?v=202611161019","js/views.js?v=202611161019","js/chapters.js?v=202611161019","icons/icon-64.png","icons/icon-192.png","icons/icon-512.png","icons/maskable-192.png","icons/maskable-512.png","icons/apple-touch-icon.png","icons/favicon-32.png"];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(SHELL_CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
