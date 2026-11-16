@@ -96,8 +96,7 @@
       '<form class="rsearch chsearch" role="search"><input class="finput" type="search" placeholder="이 메뉴에서 찾기(예: ' + esc(key === 'district' ? '광주공업, 드론, 정주' : key === 'center' ? '면접, 간호, 장려금' : key === 'fpstat' ? '학교 이름, 선도기업, 전환' : '연장실습, 지원금, 선도기업') + ')" aria-label="' + esc(ch.title) + ' 안에서 찾기" value="' + esc(st.q) + '" enterkeyhint="search"><button type="submit">찾기</button></form>' +
       '<p class="hitnote chnote" hidden></p>' +
       '<nav class="secnav chnav" aria-label="바로가기">' + secs.map(function (s) { return '<a href="#" data-sec="' + esc(s.id) + '">' + esc(s.title) + '</a>'; }).join('') + '</nav>' +
-      '<div class="chbody"></div>' +
-      '<p class="muted small">출처: ' + esc(ch.source || '') + '</p>';
+      '<div class="chbody"></div>';
     var body = el.querySelector('.chbody'), note = el.querySelector('.chnote'), inp = el.querySelector('input');
     function paint() {
       var q = st.q.trim(), toks = q.split(/\s+/).map(norm).filter(Boolean);

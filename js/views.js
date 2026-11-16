@@ -71,11 +71,10 @@
       '<div class="tile"><span class="tl">진학률</span><span class="tv">' + pct(nat.advRate) + '</span><span class="td">졸업자 대비</span></div>' +
       '<div class="tile"><span class="tl">광주 취업률</span><span class="tv">' + pct(gj && gj.rate) + '</span><span class="td">17개 시도 중 ' + (gj ? esc(gj.rank) : '–') + '위</span></div>' +
       '<div class="tile"><span class="tl">300인 이상 기업 취업</span><span class="tv">' + pct(R0.big300) + '</span><span class="td">취업자 중 비중</span></div>' +
-      '</div><p class="muted m0" id="hstatsrc"></p></div>' +
+      '</div></div>' +
       '<div class="sect"><h2>현장실습, 이렇게 물어보세요 <a href="#/fp/ask">질문하기</a></h2><div class="quickgrid">' +
       quick.map(function (o) { return '<a class="qcard" href="#/fp/' + esc(o.x.id) + '"><span class="qi" aria-hidden="true">?</span><b>' + esc(o.x.q) + '</b></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>새로 올라온 자료 <a href="#/res">자료실</a></h2><div class="rgrid">' + d.resources.slice(0, 3).map(resCard).join('') + '</div></div>';
-    el.querySelector('#hstatsrc').textContent = '출처: ' + st.source + '(' + (R0.releasedAt || '') + ' 발표)';
     el.querySelector('#hsearch').addEventListener('submit', function (e) { e.preventDefault(); var v = el.querySelector('#hq').value.trim(); if (v) MJG.go('#/search/' + encodeURIComponent(v)); });
   };
 
