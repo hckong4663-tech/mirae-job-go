@@ -409,3 +409,16 @@ textarea.brief{width:100%;box-sizing:border-box;font:inherit;font-size:.92rem;li
 @media (max-width:520px){.view[data-view="fpst"] .pubseg small{display:none}.view[data-view="fpst"] .stickybar .fchip{min-height:36px;padding:0 12px;font-size:.86rem}}
 .view[data-view="fpst"] .tiles{grid-template-columns:repeat(3,1fr)}
 @media (max-width:640px){.view[data-view="fpst"] .tiles{grid-template-columns:repeat(2,1fr)}}
+/* 취업·현장실습 통계 묶음 화면 */
+.hubtabs{display:flex;gap:4px;padding:4px;margin:4px 0 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.hubtabs a{flex:1;text-align:center;padding:11px 6px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:.98rem;min-height:44px;display:flex;align-items:center;justify-content:center}
+.hubtabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.hubtabs a:not([aria-current]):hover{background:var(--accent-weak)}
+@media (max-width:520px){.hubtabs a{font-size:.88rem;padding:9px 4px}}
+.svsel select{min-width:220px}
+.tabbar a span:last-child{white-space:nowrap}
+@media (max-width:400px){.tabbar a span:last-child{font-size:.68rem;letter-spacing:-.02em}}
+.hubbody .stickybar .pubseg:not(.seg){display:flex;flex-wrap:wrap;gap:6px;background:none;border:0;padding:0}
+.hubbody .stickybar .pubseg:not(.seg) .fchip{flex:0 0 auto;width:auto;min-height:38px;padding:0 14px;border-radius:999px}
+@media (max-width:520px){.hubbody .stickybar .pubseg:not(.seg) small{display:none}.hubbody .stickybar{padding-top:6px;padding-bottom:6px}}
+.hubbody .svsel{display:flex;align-items:center;gap:8px;margin-bottom:6px}
