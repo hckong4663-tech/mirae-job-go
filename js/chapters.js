@@ -93,7 +93,7 @@
     var files = (ch.files || []).map(function (f) { var u = MJG.safeUrl(f.url); return u ? '<a class="chfile" href="' + esc(u) + '"' + (u.charAt(0) === '#' ? '' : ' target="_blank" rel="noopener noreferrer"') + '>⬇ ' + esc(f.title) + '</a>' : ''; }).join('');
     el.innerHTML = (opts.inPanel ? '<h2 class="vt2">' + esc(ch.title) + '</h2>' : '<h1 class="vt">' + esc(ch.title) + '</h1>') +
       '<p class="vsub">' + esc(ch.lead) + '</p>' + (files ? '<div class="chfiles">' + files + '</div>' : '') +
-      '<form class="rsearch chsearch" role="search"><input class="finput" type="search" placeholder="이 메뉴에서 찾기(예: ' + esc(key === 'district' ? '광주공업, 드론, 정주' : key === 'center' ? '면접, 간호, 장려금' : key === 'fpstat' ? '학교 이름, 선도기업, 전환' : '연장실습, 지원금, 선도기업') + ')" aria-label="' + esc(ch.title) + ' 안에서 찾기" value="' + esc(st.q) + '" enterkeyhint="search"><button type="submit">찾기</button></form>' +
+      '<form class="rsearch chsearch" role="search"><input class="finput" type="search" placeholder="이 메뉴에서 찾기(예: ' + esc(key === 'district' ? '광주공업, 드론, 정주' : key === 'center' ? '면접, 간호, 장려금' : '연장실습, 지원금, 선도기업') + ')" aria-label="' + esc(ch.title) + ' 안에서 찾기" value="' + esc(st.q) + '" enterkeyhint="search"><button type="submit">찾기</button></form>' +
       '<p class="hitnote chnote" hidden></p>' +
       '<nav class="secnav chnav" aria-label="바로가기">' + secs.map(function (s) { return '<a href="#" data-sec="' + esc(s.id) + '">' + esc(s.title) + '</a>'; }).join('') + '</nav>' +
       '<div class="chbody"></div>';
@@ -138,7 +138,6 @@
   }
   V.center = view('center');
   V.district = view('district');
-  V.fpstat = view('fpstat');
 })();
 
 /* 통합 검색·자료실 검색에서 쓰는 챕터 검색 결과(링크 HTML 목록) */
@@ -146,7 +145,7 @@
   'use strict';
   var MJG = window.MJG, esc = MJG.esc;
   function norm(s) { return String(s || '').toLowerCase().replace(/[\s·・,.\-–—_()\[\]「」『』‘’“”"'/|:;!?~]/g, ''); }
-  var NAME = { fpleaf: '현장실습 리플릿', center: '취업지원센터', district: '혁신지구', fpstat: '현장실습 통계' };
+  var NAME = { fpleaf: '현장실습 리플릿', center: '취업지원센터', district: '혁신지구' };
   MJG.chapterHits = function (v) {
     var toks = String(v || '').trim().split(/\s+/).map(norm).filter(Boolean), out = [];
     if (!toks.length) return out;

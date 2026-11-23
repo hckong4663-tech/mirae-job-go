@@ -61,7 +61,8 @@
       '<div class="sect"><h2>취업 지원 한곳에서</h2><div class="guidegrid2">' +
       '<a class="guidecard" href="#/center"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터</b><small>지원 사업, 13개 직업계고 학과·연락처, 취업 후 혜택</small></span><span class="ga" aria-hidden="true">→</span></a>' +
       '<a class="guidecard" href="#/district"><span class="ri" aria-hidden="true">혁</span><span class="gb"><b>빛고을 직업교육혁신지구</b><small>취업동아리 40팀 현황, 지역대학 연계, 정주·일학습병행지원금</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-      '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>공통매뉴얼 리플릿(기업용·학교용) 핵심 정리</small></span><span class="ga" aria-hidden="true">→</span></a></div></div>' +
+      '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>공통매뉴얼 리플릿(기업용·학교용) 핵심 정리</small></span><span class="ga" aria-hidden="true">→</span></a>' +
+      '<a class="guidecard" href="#/fpst"><span class="ri" aria-hidden="true">통</span><span class="gb"><b>현장실습 현황</b><small>2023~2025학년도 참여·채용전환·학교별 그래프</small></span><span class="ga" aria-hidden="true">→</span></a></div></div>' +
       '<div class="sect"><h2>공지사항 <a href="#/notices">전체 보기</a></h2><div class="list">' +
       pins.map(function (n) { return '<a class="li" href="#/notices/' + esc(n.id) + '"><span class="ld">' + esc(MJG.fmtDate(n.date)) + '</span><span class="lb"><b>' + (n.pin ? '<span class="pin">고정</span>' : '') + esc(n.title) + '</b></span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>다가오는 일정 <a href="#/schedule">전체 일정</a></h2>' + schedHtml(up) + '</div>' +
@@ -130,7 +131,7 @@
       '<p class="hitnote" id="hitnote" hidden></p>' +
       '<div class="sect"><h2>꼭 알아둘 기준</h2><dl class="facts">' + (ro.keyfacts || []).map(function (f) { return '<dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('') + '</dl></div>' +
       '<a class="statlink" href="#/stats" id="toStats"><span><b>' + esc(ro.name) + '에게 필요한 취업통계 보기</b><small>' + esc({ student: '내 계열 취업률, 선배들이 취업한 회사 규모·업종, 취업 유지율', teacher: '광주·전남과 전국 비교, 학교유형·계열별 취업률, 유지취업률', jobcoach: '시도·계열별 취업률, 업종·규모별 취업처, 관내·관외 취업', school: '시도 순위, 학교유형·설립주체별 비교, 연도별 추이', company: '업종·사업장 규모별 취업자, 계열별 배출 인원', supervisor: '우리 지역 4개년 추이·시도 순위, 보고용 요약 문장(개조식), 연계 사업 바로가기' }[ro.key] || '') + '</small></span><span aria-hidden="true">→</span></a>' +
-      '<div class="sect"><h2>함께 보면 좋은 메뉴</h2><div class="guidegrid2">' + (ro.key === 'supervisor' ? [['#/fpstat', '통', '현장실습 통계(장학사 확인용)', '학교별 참여·유형·기업·취업 전환·지원금'], ['#/stats', '취', '취업통계 정책 브리핑', '우리 지역 4개년 추이·보고용 요약 문장']] : []).concat([['#/center', '센', '취업지원센터', '지원 사업·13개교 학과 현황·취업 후 혜택'], ['#/district', '혁', '빛고을 직업교육혁신지구', '취업동아리 현황·지역대학 연계·정주지원금'], ['#/fp/leaf', '실', '현장실습 리플릿 요약', '운영 기준·지원금·적용 법령']]).map(function (m) { return '<a class="guidecard" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><span class="gb"><b>' + m[2] + '</b><small>' + m[3] + '</small></span><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div></div>' +
+      '<div class="sect"><h2>함께 보면 좋은 메뉴</h2><div class="guidegrid2">' + (ro.key === 'supervisor' ? [['#/fpst', '통', '현장실습 현황', '참여·채용전환·학교별·실습 여건 그래프'], ['#/stats', '취', '취업통계 정책 브리핑', '우리 지역 4개년 추이·보고용 요약 문장']] : []).concat([['#/center', '센', '취업지원센터', '지원 사업·13개교 학과 현황·취업 후 혜택'], ['#/district', '혁', '빛고을 직업교육혁신지구', '취업동아리 현황·지역대학 연계·정주지원금'], ['#/fp/leaf', '실', '현장실습 리플릿 요약', '운영 기준·지원금·적용 법령']]).map(function (m) { return '<a class="guidecard" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><span class="gb"><b>' + m[2] + '</b><small>' + m[3] + '</small></span><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>단계별 체크리스트 <button type="button" class="ghost" id="ckreset">체크 초기화</button></h2><p class="muted m0" id="ckhint"></p><div class="phases">' +
       (ro.phases || []).map(function (ph, pi) {
         var done = 0; (ph.items || []).forEach(function (it, ii) { if (saved[pi + '-' + ii]) done++; });
@@ -363,7 +364,7 @@
     return s + '</svg>';
   }
   function fmtN(v, dp) { if (v == null) return '–'; return dp ? (+v).toFixed(dp) : Math.round(v).toLocaleString('ko-KR'); }
-  function cw() { var v = document.querySelector('.view[data-view="stats"]'); var w = v && v.clientWidth ? v.clientWidth - 64 : 680; return Math.max(300, Math.min(880, w)); }
+  function cw() { var v = document.querySelector('.view:not([hidden])[data-view="fpst"]') || document.querySelector('.view[data-view="stats"]'); var w = v && v.clientWidth ? v.clientWidth - 64 : 680; return Math.max(300, Math.min(880, w)); }
   function bindTips(root) {
     root.querySelectorAll('svg.chart .hit').forEach(function (h) {
       function show(e) { var p = e.touches ? e.touches[0] : e; MJG.tip.show(h.getAttribute('data-tip'), p.clientX, p.clientY); var n = h.nextElementSibling; if (n && n.classList.contains('hl')) n.classList.add('on'); }
@@ -446,15 +447,7 @@
       h += '<div class="card"><h3>' + esc(G.sido) + ' 4개년 추이 <span class="muted small">(발표연도 기준, 괄호는 대상 학년도)</span></h3><div class="tablewrap"><table class="dtable"><thead><tr><th>발표(대상)</th><th class="n">취업률</th><th class="n">순위</th><th class="n">전국</th><th class="n">전국 대비</th><th class="n">진학률</th><th class="n">관내 취업</th></tr></thead><tbody>' +
         rows4.map(function (x) { return '<tr' + (x.pub === R.pub ? ' class="em"' : '') + '><td>' + x.pub + '년 발표<br><small class="muted">' + esc(x.cohort) + '</small></td><td class="n">' + pct(x.rate) + '</td><td class="n">' + (x.rank == null ? '–' : esc(String(x.rank)) + '위') + '</td><td class="n">' + pct(x.nat) + '</td><td class="n">' + sgn(x.gap) + '</td><td class="n">' + pct(x.adv) + '</td><td class="n">' + (x.ins == null ? '–' : x.ins.toFixed(1) + '%') + '</td></tr>'; }).join('') +
         '</tbody></table></div></div>';
-      h += '<div class="card"><h3>연계 사업·자료 바로가기</h3><div class="guidegrid2">' +
-        '<a class="guidecard" href="#/center/programs"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터 지원 사업</b><small>역량 강화·공공기관 면접·채용연계형 직무교육, 13개교 학과 현황</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-        '<a class="guidecard" href="#/district/clubs"><span class="ri" aria-hidden="true">혁</span><span class="gb"><b>혁신지구 취업동아리 현황</b><small>40팀 580명, 학교·계열 검색 시 합계 자동 계산</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-        '<a class="guidecard" href="#/district/benefit"><span class="ri" aria-hidden="true">혜</span><span class="gb"><b>지역 정착 지원 혜택</b><small>정주지원금·일학습병행지원금·유지기업 지원금</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-        '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>운영 기준·지원금·적용 법령</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-        '<a class="guidecard" href="#/fpstat"><span class="ri" aria-hidden="true">통</span><span class="gb"><b>현장실습 통계(장학사 확인용)</b><small>학교별 참여·유형·기업·취업 전환·지원금 현황</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-        '<a class="guidecard" href="#/role/supervisor"><span class="ri" aria-hidden="true">장</span><span class="gb"><b>장학사 업무 안내</b><small>법적 근거, 연간 업무 체크리스트, 지도·점검 질문</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-        '<a class="guidecard" href="' + esc(MJG.safeUrl(R.file)) + '" target="_blank" rel="noopener"><span class="ri" aria-hidden="true">원</span><span class="gb"><b>' + R.pub + '년 KEDI 원문</b><small>세부 분석 자료(' + esc(R.fileType || '') + ') 내려받기</small></span><span class="ga" aria-hidden="true">↗</span></a>' +
-        '</div></div></section>';
+      h += '</section>';
     }
 
     /* 1. 한눈에 */
@@ -621,6 +614,120 @@
     });
     if (!V._statsResize) { V._statsResize = true; var tm; window.addEventListener('resize', function () { clearTimeout(tm); tm = setTimeout(function () { var v = document.querySelector('.view[data-view="stats"]'); if (v && !v.hidden) { var y = window.scrollY; V.stats(v); window.scrollTo(0, y); } }, 250); }); }
   };
+  /* ───────── 현장실습 현황(통계 그래프만) ───────── */
+  var FS = { year: null, region: '광주' };
+  function fsHead(id, title, sub) { return '<section class="ssec" id="fs-' + id + '"><h2 class="sh">' + esc(title) + '</h2>' + (sub ? '<p class="ssub">' + sub + '</p>' : ''); }
+  V.fpst = function (el) {
+    var F = D().fpst;
+    if (!F || !(F.years || []).length) { el.innerHTML = '<h1 class="vt">현장실습 현황</h1><p class="muted">아직 등록된 자료가 없습니다.</p>'; return; }
+    var regions = F.regions || ['광주'];
+    var yearsOf = function (rg) { return F.years.filter(function (y) { return y.region === rg; }).sort(function (a, b) { return b.year - a.year; }); };
+    var allYears = []; F.years.forEach(function (y) { if (allYears.indexOf(y.year) < 0) allYears.push(y.year); }); allYears.sort(function (a, b) { return b - a; });
+    if (FS.year == null || allYears.indexOf(FS.year) < 0) FS.year = allYears[0];
+    var get = function (rg, yr) { return F.years.filter(function (y) { return y.region === rg && y.year === yr; })[0] || null; };
+    var Y = get(FS.region, FS.year), YP = get(FS.region, FS.year - 1);
+    var anyYr = F.years.filter(function (y) { return y.year === FS.year; })[0];
+    var rate = function (a, b) { return b ? a / b * 100 : null; };
+    var partR = function (y) { return y ? rate(y.total.part, y.total.target) : null; };
+    var convR = function (y) { return y ? rate(y.total.conv, y.total.part) : null; };
+    var W = function () { var v = el.clientWidth ? el.clientWidth - 64 : 680; return Math.max(300, Math.min(880, v)); };
+    var cntRows = function (list, em) { return list.map(function (r) { return [r[0], r[1], em && em(r)]; }); };
+    var sumOf = function (list) { return list.reduce(function (a, r) { return a + r[1]; }, 0); };
+    var pend = function (rg) { return '<p class="muted m0">' + esc((F.pending && F.pending[rg]) || (rg + ' 자료는 반영 예정입니다.')) + '</p>'; };
+    var SECS = [['ov', '한눈에'], ['tr', '연도별 추이'], ['ty', '유형·기업별'], ['sc', '학교별'], ['fd', '실습 분야'], ['cd', '실습 여건'], ['en', '종료·채용전환'], ['sf', '안전·교육'], ['df', '용어']];
+    var h = '<h1 class="vt">현장실습 현황</h1>' +
+      '<div class="stickybar"><div class="pubseg" role="group" aria-label="학년도">' + allYears.map(function (y) { var o = F.years.filter(function (x) { return x.year === y; })[0]; return '<button type="button" class="fchip" data-fyear="' + y + '" aria-pressed="' + (y === FS.year) + '">' + y + '학년도<small> ' + esc(o.base) + ' 기준</small></button>'; }).join('') + '</div>' +
+      '<div class="lens" role="group" aria-label="지역"><span class="fl">지역</span>' + regions.map(function (rg) { var has = yearsOf(rg).length > 0; return '<button type="button" class="fchip" data-fregion="' + esc(rg) + '" aria-pressed="' + (rg === FS.region) + '">' + esc(rg) + (has ? '' : '<small> 반영 예정</small>') + '</button>'; }).join('') + '</div></div>' +
+      '<div class="cohort"><span class="cbig">' + FS.year + '학년도 3학년</span><span>' + esc(anyYr.base) + ' 기준 · ' + esc(FS.region) + '</span></div>' +
+      '<nav class="secnav" aria-label="바로가기">' + SECS.map(function (s) { return '<button type="button" data-fgo="' + s[0] + '">' + s[1] + '</button>'; }).join('') + '</nav>';
+
+    /* 1. 한눈에 */
+    h += fsHead('ov', '한눈에 보기', '');
+    if (!Y) h += '<div class="card">' + pend(FS.region) + '</div>';
+    else {
+      var T = Y.total, Dt = Y.detail, early = Dt.end.filter(function (e) { return /^조기복교/.test(e[0]); }).reduce(function (a, e) { return a + e[1]; }, 0);
+      var tile = function (l, v, d) { return '<div class="tile"><span class="tl">' + l + '</span><span class="tv">' + v + '</span><span class="td">' + d + '</span></div>'; };
+      h += '<div class="tiles">' +
+        tile('취업대상자', fmtN(T.target) + '명', '남 ' + fmtN(T.targetM) + ' · 여 ' + fmtN(T.targetF)) +
+        tile('현장실습 참여', fmtN(T.part) + '명', '참여율 ' + pct(partR(Y)) + (YP ? ' ' + delta(partR(Y), partR(YP)) : '')) +
+        tile('채용전환', fmtN(T.conv) + '명', '전환율 ' + pct(convR(Y)) + (YP ? ' ' + delta(convR(Y), convR(YP)) : '')) +
+        tile('현장실습 기업', fmtN(T.comp) + '곳', '참여기업 ' + fmtN(T.compPart) + ' · 선도기업 ' + fmtN(T.compLead)) +
+        tile('조기복교', pct(rate(early, Dt.n)), '실습 ' + fmtN(Dt.n) + '건 중 ' + fmtN(early) + '건') +
+        tile('학생 만족도', Dt.satAvg == null ? '–' : Dt.satAvg.toFixed(2) + '점', '5점 만점 · 응답 ' + fmtN(Dt.satN) + '건') +
+        '</div>';
+      h += '<div class="card"><h3>성별 현황</h3>' + hbar([['남 참여율', rate(T.partM, T.targetM)], ['여 참여율', rate(T.partF, T.targetF)], ['남 채용전환율', rate(T.convM, T.partM)], ['여 채용전환율', rate(T.convF, T.partF)]], { W: W(), label: '성별 참여율·채용전환율', metric: '' }) + '</div>';
+    }
+    h += '</section>';
+
+    /* 2. 연도별 추이(광주·전남 함께) */
+    var xs = allYears.slice().reverse();
+    var serie = function (fn) { return regions.map(function (rg, i) { return { name: rg + (yearsOf(rg).length ? '' : '(반영 예정)'), cls: 's' + (i + 1), values: xs.map(function (yr) { return fn(get(rg, yr)); }) }; }); };
+    var legend = function () { return '<div class="legend">' + regions.map(function (rg, i) { return '<span><i class="c' + (i + 1) + '"></i>' + esc(rg) + (yearsOf(rg).length ? '' : ' · 자료 반영 예정') + '</span>'; }).join('') + '</div>'; };
+    h += fsHead('tr', '연도별 추이', '광주·전남을 함께 보여 줍니다. 자료가 반영되지 않은 지역은 선 없이 범례에만 표시됩니다.');
+    h += '<div class="card"><h3>현장실습 참여율</h3>' + legend() + lineChart(xs.map(function (y) { return y + '학년도'; }), serie(partR), { W: W(), label: '연도별 현장실습 참여율' }) + '</div>';
+    h += '<div class="card"><h3>채용전환율</h3>' + legend() + lineChart(xs.map(function (y) { return y + '학년도'; }), serie(convR), { W: W(), label: '연도별 채용전환율' }) + '</div>';
+    h += '<div class="card"><h3>' + FS.year + '학년도 지역 비교</h3>' +
+      hbar(regions.map(function (rg) { return [rg + ' 참여율', partR(get(rg, FS.year)), rg === FS.region]; }).concat(regions.map(function (rg) { return [rg + ' 채용전환율', convR(get(rg, FS.year)), rg === FS.region]; })), { W: W(), label: '지역별 참여율·채용전환율' }) + '</div>';
+    h += table(['학년도', '지역', '취업대상자', '참여', '참여율', '채용전환', '전환율', '기업 수'], [].concat.apply([], xs.slice().reverse().map(function (yr) { return regions.map(function (rg) { var y = get(rg, yr); return { em: yr === FS.year && rg === FS.region, c: y ? [yr + '학년도', esc(rg), fmtN(y.total.target), fmtN(y.total.part), pct(partR(y)), fmtN(y.total.conv), pct(convR(y)), fmtN(y.total.comp)] : [yr + '학년도', esc(rg), '–', '–', '반영 예정', '–', '–', '–'] }; }); })), { textCols: 2 });
+    h += '</section>';
+
+    if (Y) {
+      var T2 = Y.total, D2 = Y.detail;
+      /* 3. 유형·기업별 */
+      h += fsHead('ty', '현장실습 유형·기업 유형별', '학생 기준(재참여는 1명)입니다.');
+      h += '<div class="card"><h3>유형별 참여 학생</h3>' + hbar(T2.types.map(function (t) { return [t[0], t[1] + t[2], false, '남 ' + t[1] + ' · 여 ' + t[2]]; }), { W: W(), unit: '명', label: '현장실습 유형별 참여 학생', metric: '' }) + '</div>';
+      h += '<div class="card"><h3>기업 유형별 참여·채용전환</h3>' + hbar([].concat.apply([], T2.partByComp.map(function (p, i) { var c = T2.convByComp[i]; return [[p[0] + ' 참여', p[1] + p[2], false, '남 ' + p[1] + ' · 여 ' + p[2]], [p[0] + ' 채용전환', c[1] + c[2], true, '전환율 ' + pct(rate(c[1] + c[2], p[1] + p[2]))]]; })), { W: W(), unit: '명', label: '기업 유형별 참여와 채용전환', metric: '' }) +
+        '<p class="m0 small muted">현장실습 기업 ' + fmtN(T2.comp) + '곳(참여기업 ' + fmtN(T2.compPart) + ', 선도기업 ' + fmtN(T2.compLead) + ')</p></div>';
+      h += '</section>';
+
+      /* 4. 학교별 */
+      var sc = Y.schools.slice();
+      h += fsHead('sc', '학교별 현황', '학교별 참여율(참여 ÷ 취업대상자)과 채용전환 학생 수입니다.');
+      h += '<div class="card"><h3>학교별 현장실습 참여율</h3>' + hbar(sc.slice().sort(function (a, b) { return rate(b.part, b.target) - rate(a.part, a.target); }).map(function (s) { return [s.school, rate(s.part, s.target), false, '참여 ' + s.part + '명 / 대상 ' + s.target + '명']; }), { W: W(), label: '학교별 현장실습 참여율', metric: '참여율', avg: partR(Y), avgLabel: FS.region }) + '</div>';
+      h += '<div class="card"><h3>학교별 채용전환 학생</h3>' + hbar(sc.slice().sort(function (a, b) { return b.conv - a.conv; }).map(function (s) { return [s.school, s.conv, false, '참여 ' + s.part + '명 중 ' + s.conv + '명']; }), { W: W(), unit: '명', label: '학교별 채용전환 학생', metric: '' }) + '</div>';
+      h += table(['학교', '졸업자', '취업대상자', '참여', '참여율', '채용전환', '전환율', '취업률(남)', '취업률(여)'], sc.map(function (s) { return { c: [esc(s.school), fmtN(s.grad), fmtN(s.target), fmtN(s.part), pct(rate(s.part, s.target)), fmtN(s.conv), pct(rate(s.conv, s.part)), pct(s.rateM), pct(s.rateF)] }; }), { title: '학교별 표로 보기' });
+      h += '</section>';
+
+      /* 5. 실습 분야 */
+      h += fsHead('fd', '실습 분야(NCS)', '실습 건 기준(재참여 포함 ' + fmtN(D2.n) + '건)입니다.');
+      h += '<div class="card">' + hbar(cntRows(D2.field), { W: W(), unit: '건', label: '실습 분야별 실습 건수', metric: '' }) + '</div></section>';
+
+      /* 6. 실습 여건 */
+      h += fsHead('cd', '실습 여건', '실습 건 기준입니다.');
+      [['weeks', '실습 기간'], ['wage', '현장실습 수당'], ['place', '실습 장소(지역)'], ['size', '기업 규모(상시근로자)']].forEach(function (k) {
+        h += '<div class="card"><h3>' + k[1] + '</h3>' + hbar(D2[k[0]].map(function (r) { return [r[0], r[1], false, pct(rate(r[1], D2.n))]; }), { W: W(), unit: '건', label: k[1], metric: '' }) + '</div>';
+      });
+      h += '</section>';
+
+      /* 7. 종료·채용전환 */
+      h += fsHead('en', '실습 종료와 채용전환', '실습 건 기준입니다.');
+      h += '<div class="card">' + hbar(D2.end.map(function (r) { return [r[0], r[1], /채용전환/.test(r[0]), pct(rate(r[1], D2.n))]; }), { W: W(), unit: '건', label: '실습 종료 구분', metric: '' }) + '</div></section>';
+
+      /* 8. 안전·교육 */
+      h += fsHead('sf', '안전·교육·지도', '실습 건 기준 비율입니다.');
+      h += '<div class="card"><h3>교육 이수·지도 비율</h3>' + hbar([['권익보호·산업안전 교육', D2.eduRights], ['의무교육 이수', D2.eduMust], ['전공 적합 실습', D2.major], ['노무사 기업코칭', D2.coach]].concat(D2.visit != null ? [['교사 대면 순회지도', D2.visit]] : []), { W: W(), label: '교육 이수·지도 비율', metric: '' }) + '</div>';
+      h += '<div class="card"><h3>실습 직전 특별교육 방식</h3>' + hbar(D2.pre.map(function (r) { return [r[0], r[1], false, pct(rate(r[1], D2.n)) + '(중복 응답)']; }), { W: W(), unit: '건', label: '실습 직전 특별교육 방식', metric: '' }) + '</div>';
+      h += '<div class="tiles">' +
+        '<div class="tile"><span class="tl">사고 발생</span><span class="tv">' + fmtN(D2.accident) + '건</span><span class="td">산재 처리 ' + fmtN(D2.injury) + '건</span></div>' +
+        '<div class="tile"><span class="tl">협약 위반</span><span class="tv">' + fmtN(D2.breach) + '건</span><span class="td">하이파이브 기록 기준</span></div></div>';
+      h += '</section>';
+    } else {
+      ['ty', 'sc', 'fd', 'cd', 'en', 'sf'].forEach(function (id) { var t = SECS.filter(function (s) { return s[0] === id; })[0]; h += fsHead(id, t[1], '') + '<div class="card">' + pend(FS.region) + '</div></section>'; });
+    }
+
+    /* 9. 용어 */
+    h += fsHead('df', '용어', '') + '<dl class="defs">' + (F.definitions || []).map(function (d) { return '<dt>' + esc(d[0]) + '</dt><dd>' + esc(d[1]) + '</dd>'; }).join('') + '</dl></section>';
+
+    el.innerHTML = h;
+    bindTips(el);
+    var redraw = function () { var y = window.scrollY; MJG._keepScroll = true; V.fpst(el); window.scrollTo(0, y); };
+    el.querySelectorAll('[data-fyear]').forEach(function (b) { b.addEventListener('click', function () { FS.year = +b.getAttribute('data-fyear'); redraw(); }); });
+    el.querySelectorAll('[data-fregion]').forEach(function (b) { b.addEventListener('click', function () { FS.region = b.getAttribute('data-fregion'); redraw(); }); });
+    el.querySelectorAll('[data-fgo]').forEach(function (b) { b.addEventListener('click', function () { var t = el.querySelector('#fs-' + b.getAttribute('data-fgo')); if (t) { var bar = el.querySelector('.stickybar'); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - (bar ? bar.offsetHeight + 70 : 70), behavior: 'smooth' }); } }); });
+    if (!V._fpstResize) { V._fpstResize = true; var tm; window.addEventListener('resize', function () { clearTimeout(tm); tm = setTimeout(function () { var v = document.querySelector('.view[data-view="fpst"]'); if (v && !v.hidden) redraw2(v); }, 250); }); }
+  };
+  function redraw2(v) { var y = window.scrollY; MJG._keepScroll = true; V.fpst(v); window.scrollTo(0, y); }
+
   /* ───────── 더보기(설치·설정·정보) ───────── */
   V.more = function (el) {
     var d = D(), plat = MJG.platform(), C = window.MJG_CONFIG || {};
@@ -632,7 +739,7 @@
       ['ios', '아이폰·아이패드', ['사파리로 앱 주소에 접속합니다.', '아래쪽 공유 버튼(□↑)을 누릅니다.', '‘홈 화면에 추가’ → ‘추가’를 누르면 아이콘이 생깁니다.']]
     ];
     var lastc = MJG.store.get('mjg.lastcheck');
-    el.innerHTML = '<h1 class="vt">더보기</h1><div class="guidegrid moremenu">' + [['#/center', '센', '취업지원센터'], ['#/district', '혁', '직업교육혁신지구'], ['#/fp/leaf', '실', '현장실습 리플릿 요약'], ['#/schedule', '일', '주요 일정'], ['#/notices', '공', '공지사항'], ['#/search', '검', '통합 검색']].map(function (m) { return '<a class="guidemini" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><b>' + m[2] + '</b><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div>' +
+    el.innerHTML = '<h1 class="vt">더보기</h1><div class="guidegrid moremenu">' + [['#/fpst', '통', '현장실습 현황'], ['#/center', '센', '취업지원센터'], ['#/district', '혁', '직업교육혁신지구'], ['#/fp/leaf', '실', '현장실습 리플릿 요약'], ['#/schedule', '일', '주요 일정'], ['#/notices', '공', '공지사항'], ['#/search', '검', '통합 검색']].map(function (m) { return '<a class="guidemini" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><b>' + m[2] + '</b><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div>' +
       '<h2 class="vt2">설치·설정·앱 정보</h2>' +
       '<div class="card sect"><h2>앱 설치(무료)</h2>' +
       (MJG.standalone() ? '<p class="ok">✓ 지금 설치된 앱으로 실행 중입니다.</p>' :
