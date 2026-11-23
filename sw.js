@@ -1,9 +1,9 @@
 /* 미래 JOB GO 서비스워커 — 오프라인 실행용(같은 출처 요청만 처리, 외부 요청은 관여하지 않음) */
 'use strict';
-var BUILD = '202611230546';
+var BUILD = '202611230557';
 var SHELL_CACHE = 'mjg-shell-' + BUILD;
 var FILE_CACHE = 'mjg-files-v1';
-var SHELL = ["./","index.html","manifest.webmanifest?v=71720f20e2","css/fp.css?v=202611230546","css/app.css?v=202611230546","js/config.js?v=202611230546","data/content.js?v=202611230546","js/core.js?v=202611230546","js/fp-ask.js?v=202611230546","js/fp-ui.js?v=202611230546","js/views.js?v=202611230546","js/chapters.js?v=202611230546","icons/icon-64.png?v=71720f20e2","icons/icon-192.png?v=71720f20e2","icons/icon-512.png?v=71720f20e2","icons/maskable-192.png?v=71720f20e2","icons/maskable-512.png?v=71720f20e2","icons/apple-touch-icon.png?v=71720f20e2","icons/favicon-32.png?v=71720f20e2"];
+var SHELL = ["./","index.html","manifest.webmanifest?v=71720f20e2","css/fp.css?v=202611230557","css/app.css?v=202611230557","js/config.js?v=202611230557","data/content.js?v=202611230557","js/core.js?v=202611230557","js/fp-ask.js?v=202611230557","js/fp-ui.js?v=202611230557","js/views.js?v=202611230557","js/chapters.js?v=202611230557","icons/icon-64.png?v=71720f20e2","icons/icon-192.png?v=71720f20e2","icons/icon-512.png?v=71720f20e2","icons/maskable-192.png?v=71720f20e2","icons/maskable-512.png?v=71720f20e2","icons/apple-touch-icon.png?v=71720f20e2","icons/favicon-32.png?v=71720f20e2"];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(SHELL_CACHE).then(function (c) { return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));

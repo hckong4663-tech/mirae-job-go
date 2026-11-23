@@ -422,3 +422,18 @@ textarea.brief{width:100%;box-sizing:border-box;font:inherit;font-size:.92rem;li
 .hubbody .stickybar .pubseg:not(.seg) .fchip{flex:0 0 auto;width:auto;min-height:38px;padding:0 14px;border-radius:999px}
 @media (max-width:520px){.hubbody .stickybar .pubseg:not(.seg) small{display:none}.hubbody .stickybar{padding-top:6px;padding-bottom:6px}}
 .hubbody .svsel{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+/* 전국·지역 구분 */
+.scope{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:800;letter-spacing:.02em}
+.scope.scN{background:#e3edfb;color:#1d5fb8}
+.scope.scR{background:#fde9df;color:#b4461a}
+:root[data-theme="dark"] .scope.scN{background:#17304f;color:#9cc3f5}:root[data-theme="dark"] .scope.scR{background:#4a2414;color:#f5b597}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .scope.scN{background:#17304f;color:#9cc3f5}:root:not([data-theme="light"]) .scope.scR{background:#4a2414;color:#f5b597}}
+.scopenav{display:flex;flex-direction:column;gap:6px}
+.scopenav .scrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.scopenav .scrow .scope{margin-right:2px}
+.scopeband{display:flex;align-items:center;gap:10px;margin:26px 0 4px;padding:12px 14px;border-radius:12px;font-weight:700}
+.scopeband.scN{background:#eef4fd;border-left:5px solid #2a78d6}
+.scopeband.scR{background:#fdf1ea;border-left:5px solid #eb6834}
+.scopeband .scope{font-size:.95rem;padding:5px 14px}
+:root[data-theme="dark"] .scopeband.scN{background:#14263d}:root[data-theme="dark"] .scopeband.scR{background:#3a1f12}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .scopeband.scN{background:#14263d}:root:not([data-theme="light"]) .scopeband.scR{background:#3a1f12}}
