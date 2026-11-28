@@ -886,7 +886,7 @@
       ['ios', '아이폰·아이패드', ['사파리로 앱 주소에 접속합니다.', '아래쪽 공유 버튼(□↑)을 누릅니다.', '‘홈 화면에 추가’ → ‘추가’를 누르면 아이콘이 생깁니다.']]
     ];
     var lastc = MJG.store.get('mjg.lastcheck');
-    el.innerHTML = '<h1 class="vt">더보기</h1><div class="guidegrid moremenu">' + [['#/stats/fp', '통', '현장실습 통계'], ['#/center', '센', '취업지원센터'], ['#/district', '혁', '직업교육혁신지구'], ['#/fp/leaf', '실', '현장실습 리플릿 요약'], ['#/schedule', '일', '주요 일정'], ['#/notices', '공', '공지사항'], ['#/search', '검', '통합 검색']].map(function (m) { return '<a class="guidemini" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><b>' + m[2] + '</b><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div>' +
+    el.innerHTML = '<h1 class="vt">더보기</h1><div class="guidegrid moremenu">' + (window.MJG_PERSONAL ? [['#/qna', '질', '예상질의답변서'], ['#/res', '자', '취업지원 자료실']] : []).concat([['#/stats/fp', '통', '현장실습 통계'], ['#/center', '센', '취업지원센터'], ['#/district', '혁', '직업교육혁신지구'], ['#/fp/leaf', '실', '현장실습 리플릿 요약'], ['#/schedule', '일', '주요 일정'], ['#/notices', '공', '공지사항'], ['#/search', '검', '통합 검색']]).map(function (m) { return '<a class="guidemini" href="' + m[0] + '"><span class="ri" aria-hidden="true">' + m[1] + '</span><b>' + m[2] + '</b><span class="ga" aria-hidden="true">→</span></a>'; }).join('') + '</div>' +
       '<h2 class="vt2">설치·설정·앱 정보</h2>' +
       '<div class="card sect"><h2>앱 설치(무료)</h2>' +
       (MJG.standalone() ? '<p class="ok">✓ 지금 설치된 앱으로 실행 중입니다.</p>' :

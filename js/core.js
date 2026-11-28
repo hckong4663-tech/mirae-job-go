@@ -23,7 +23,7 @@
     u = String(u || '').trim();
     if (/^https:\/\/[^\s"'<>]+$/i.test(u)) return u;
     if (/^#\/[\w\-\/?=&%.]*$/.test(u)) return u;
-    if (/^files\/[\w\-.]+\.(pdf|hwp|hwpx|docx|xlsx|pptx|zip|png|jpg)$/i.test(u)) return u;
+    if (/^files\/[\w\-.]+\.(pdf|hwp|hwpx|docx|xlsx|pptx|zip|png|jpg)$/i.test(u)) return window.MJG_PERSONAL ? 'https://hckong4663-tech.github.io/mirae-job-go/' + u : u;
     return '';
   };
   MJG.fmtSize = function (n) { if (!n) return ''; return n >= 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB'; };
@@ -178,6 +178,7 @@
     var parts = h.split('/'); return { name: parts[0] || 'home', a: parts[1] || '', b: parts.slice(2).join('/') };
   }
   var TITLES = { home: '홈', fp: '현장실습 Q&A', res: '취업지원 자료실', resdetail: '자료', role: '대상별 안내', schedule: '주요 일정', stats: '취업·현장실습 통계', center: '취업지원센터', district: '직업교육혁신지구', fpst: '직업계고 현장실습 통계', notices: '공지사항', more: '설치·설정', search: '검색' };
+  if (window.MJG_PERSONAL) TITLES.qna = '예상질의답변서';
   MJG.route = function () {
     if (!MJG.data) return;
     var r = parseHash(), name = r.name;
@@ -230,7 +231,7 @@
       boot.hidden = true;
       MJG.route();
       window.addEventListener('hashchange', MJG.route);
-      if ('serviceWorker' in navigator && MJG.isWeb()) {
+      if ('serviceWorker' in navigator && MJG.isWeb() && !window.MJG_PERSONAL) {
         navigator.serviceWorker.register('sw.js').catch(function () {});
       }
       setTimeout(function () { MJG.checkUpdate(false); }, 1200);
