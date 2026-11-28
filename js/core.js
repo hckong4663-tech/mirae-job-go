@@ -166,8 +166,9 @@
   var FS = [14, 15, 16, 17, 18, 20];
   MJG.fsIndex = function () { var v = parseInt(MJG.store.get('mjg.fs'), 10); return isNaN(v) ? 2 : Math.min(FS.length - 1, Math.max(0, v)); };
   MJG.setFs = function (i) { i = Math.min(FS.length - 1, Math.max(0, i)); MJG.store.set('mjg.fs', String(i)); document.documentElement.style.setProperty('--fs', FS[i] + 'px'); return i; };
-  MJG.theme = function () { return MJG.store.get('mjg.theme') || 'auto'; };
-  MJG.setTheme = function (t) { MJG.store.set('mjg.theme', t); if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t); };
+  /* v1.9: 밝은(흰 바탕) 화면으로 고정 — 기기의 어두운 모드와 상관없이 같은 화면 */
+  MJG.theme = function () { return 'light'; };
+  MJG.setTheme = function () { MJG.store.del('mjg.theme'); document.documentElement.setAttribute('data-theme', 'light'); };
   MJG.setFs(MJG.fsIndex()); MJG.setTheme(MJG.theme());
 
   /* ── 라우터 ── */

@@ -2,25 +2,15 @@
 
 /* Layout: 책자 색인처럼 읽히는 한 단 구성. 상단 고정 검색·탭, 질문 목록은 펼침형, 근거는 쪽수 탭 배지로 표시 */
 :root{
-  --paper:#f3f5f4; --surface:#ffffff; --sunk:#e9eeec; --ink:#17232c; --muted:#5a6872; --line:#d6dedb;
-  --accent:#0b6a5d; --accent-ink:#ffffff; --accent-weak:#dff0eb;
-  --law:#2c4785; --law-weak:#e7ecf8;
-  --warn:#8a5300; --warn-weak:#fdf0d8;
-  --crit:#a3241c; --crit-weak:#fbe5e2;
-  --f-display:"AppleMyungjo","Apple SD Gothic Neo","Noto Serif KR","Noto Serif CJK KR","Batang","바탕",serif;
+  --paper:#ffffff; --surface:#ffffff; --sunk:#f2f5fa; --ink:#111827; --muted:#4b5563; --line:#e3e8ef;
+  --accent:#1a5fd8; --accent-ink:#ffffff; --accent-weak:#eaf1ff;
+  --law:#1a5fd8; --law-weak:#eef4ff;
+  --warn:#9a5b00; --warn-weak:#fff4dc;
+  --crit:#d92d20; --crit-weak:#fdecea;
+  --f-display:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR","Noto Sans CJK KR",system-ui,sans-serif;
   --f-body:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR","Noto Sans CJK KR",system-ui,-apple-system,sans-serif;
   --f-mono:ui-monospace,"SF Mono","Consolas","D2Coding",monospace;
   --fs:16px;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --paper:#0f1517; --surface:#162024; --sunk:#1c282c; --ink:#e3eae8; --muted:#9caaa8; --line:#2a383c;
-    --accent:#5cc4b0; --accent-ink:#06211c; --accent-weak:#163a34;
-    --law:#a9bdf0; --law-weak:#1d2944;
-    --warn:#f2b860; --warn-weak:#382a12;
-    --crit:#ff8f86; --crit-weak:#3b1a17;
-    color-scheme:dark;
-  }
 }
 :root[data-theme="dark"]{
   --paper:#0f1517; --surface:#162024; --sunk:#1c282c; --ink:#e3eae8; --muted:#9caaa8; --line:#2a383c;

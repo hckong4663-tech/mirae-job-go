@@ -62,7 +62,7 @@
       '<a class="guidecard" href="#/center"><span class="ri" aria-hidden="true">센</span><span class="gb"><b>취업지원센터</b><small>지원 사업, 13개 직업계고 학과·연락처, 취업 후 혜택</small></span><span class="ga" aria-hidden="true">→</span></a>' +
       '<a class="guidecard" href="#/district"><span class="ri" aria-hidden="true">혁</span><span class="gb"><b>빛고을 직업교육혁신지구</b><small>취업동아리 40팀 현황, 지역대학 연계, 정주·일학습병행지원금</small></span><span class="ga" aria-hidden="true">→</span></a>' +
       '<a class="guidecard" href="#/fp/leaf"><span class="ri" aria-hidden="true">실</span><span class="gb"><b>현장실습 리플릿 요약</b><small>공통매뉴얼 리플릿(기업용·학교용) 핵심 정리</small></span><span class="ga" aria-hidden="true">→</span></a>' +
-      '<a class="guidecard" href="#/stats/fp"><span class="ri" aria-hidden="true">통</span><span class="gb"><b>직업계고 현장실습 통계</b><small>2023~2025학년도 참여·채용전환·학교별 그래프</small></span><span class="ga" aria-hidden="true">→</span></a></div></div>' +
+      '<a class="guidecard" href="#/stats/fp"><span class="ri" aria-hidden="true">통</span><span class="gb"><b>직업계고 현장실습 통계</b><small>2023~2025학년도 + 2026학년도(11. 1. 기준 중간) 참여·채용전환·학교별 그래프</small></span><span class="ga" aria-hidden="true">→</span></a></div></div>' +
       '<div class="sect"><h2>공지사항 <a href="#/notices">전체 보기</a></h2><div class="list">' +
       pins.map(function (n) { return '<a class="li" href="#/notices/' + esc(n.id) + '"><span class="ld">' + esc(MJG.fmtDate(n.date)) + '</span><span class="lb"><b>' + (n.pin ? '<span class="pin">고정</span>' : '') + esc(n.title) + '</b></span></a>'; }).join('') + '</div></div>' +
       '<div class="sect"><h2>다가오는 일정 <a href="#/schedule">전체 일정</a></h2>' + schedHtml(up) + '</div>' +
@@ -625,12 +625,18 @@
     var cntRows = function (list, em) { return list.map(function (r) { return [r[0], r[1], em && em(r)]; }); };
     var sumOf = function (list) { return list.reduce(function (a, r) { return a + r[1]; }, 0); };
     var pend = function (rg) { return '<p class="muted m0">' + esc((F.pending && F.pending[rg]) || (rg + ' 자료는 반영 예정입니다.')) + '</p>'; };
-    var SECS = [['ov', '한눈에'], ['tr', '연도별 추이'], ['ty', '유형·기업별'], ['sc', '학교별'], ['fd', '실습 분야'], ['cd', '실습 여건'], ['en', '종료·채용전환'], ['sf', '안전·교육'], ['df', '용어']];
+    var SECS = [['ov', '한눈에'], ['tr', '연도별 추이'], ['ty', '유형·기업별'], ['fd', '실습 분야'], ['cd', '실습 여건'], ['en', '종료·채용전환'], ['sf', '안전·교육'], ['sc', '학교별'], ['df', '용어']];
+    var ong = function (y) { return !!(y && y.ongoing); };
+    var yl = function (yr) { var o = F.years.filter(function (x) { return x.year === yr; })[0]; return yr + '학년도' + (ong(o) ? '(중간)' : ''); };
+    var midNote = function (y) { return ong(y) ? '<p class="notebox">' + esc(y.base) + ' 기준 <b>중간 집계</b>입니다. 지금 실습 중인 학생이 ' + fmtN(y.detail.ongoing) + '건 있어 참여·채용전환 수는 학년도 말(다음 해 2. 1. 기준)까지 늘어납니다. 지난 학년도 최종 자료와 바로 비교하지 마세요.</p>' : ''; };
+    var band = function (k, t, sub) { return '<div class="scopeband sc' + k + '"><span class="scope sc' + k + '">' + t + '</span><span>' + sub + '</span></div>'; };
     var h = '' +
-      '<div class="stickybar"><div class="pubseg" role="group" aria-label="학년도">' + allYears.map(function (y) { var o = F.years.filter(function (x) { return x.year === y; })[0]; return '<button type="button" class="fchip" data-fyear="' + y + '" aria-pressed="' + (y === FS.year) + '">' + y + '학년도<small> ' + esc(o.base) + ' 기준</small></button>'; }).join('') + '</div>' +
+      '<div class="stickybar"><div class="pubseg" role="group" aria-label="학년도">' + allYears.map(function (y) { var o = F.years.filter(function (x) { return x.year === y; })[0]; return '<button type="button" class="fchip" data-fyear="' + y + '" aria-pressed="' + (y === FS.year) + '">' + y + '학년도<small> ' + esc(o.base) + ' 기준' + (o.ongoing ? '·중간' : '') + '</small></button>'; }).join('') + '</div>' +
       '<div class="lens" role="group" aria-label="지역"><span class="fl">지역</span>' + regions.map(function (rg) { var has = yearsOf(rg).length > 0; return '<button type="button" class="fchip" data-fregion="' + esc(rg) + '" aria-pressed="' + (rg === FS.region) + '">' + esc(rg) + (has ? '' : '<small> 반영 예정</small>') + '</button>'; }).join('') + '</div></div>' +
-      '<div class="cohort"><span class="cbig">' + FS.year + '학년도 3학년</span><span>' + esc(anyYr.base) + ' 기준 · ' + esc(FS.region) + '</span></div>' +
-      '<nav class="secnav" aria-label="바로가기">' + SECS.map(function (s) { return '<button type="button" class="fchip" data-fgo="' + s[0] + '">' + s[1] + '</button>'; }).join('') + '</nav>';
+      '<div class="cohort"><span class="cbig">' + FS.year + '학년도 3학년</span><span>' + esc(anyYr.base) + ' 기준' + (ong(anyYr) ? ' <span class="tag mid">중간 집계</span>' : '') + ' · ' + esc(FS.region) + '</span></div>' +
+      '<nav class="secnav scopenav" aria-label="바로가기"><div class="scrow"><span class="scope scN">전체</span>' + SECS.filter(function (s) { return s[0] !== 'sc' && s[0] !== 'df'; }).map(function (s) { return '<button type="button" class="fchip" data-fgo="' + s[0] + '">' + s[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="scrow"><span class="scope scR">학교별</span><button type="button" class="fchip" data-fgo="sc">학교별 현황</button><button type="button" class="fchip" data-fgo="df">용어</button></div></nav>';
+    h += band('N', FS.region + ' 전체', '학교를 모두 합한 통계');
 
     /* 1. 한눈에 */
     h += fsHead('ov', '한눈에 보기', '');
@@ -638,10 +644,12 @@
     else {
       var T = Y.total, Dt = Y.detail, early = Dt.end.filter(function (e) { return /^조기복교/.test(e[0]); }).reduce(function (a, e) { return a + e[1]; }, 0);
       var tile = function (l, v, d) { return '<div class="tile"><span class="tl">' + l + '</span><span class="tv">' + v + '</span><span class="td">' + d + '</span></div>'; };
-      h += '<div class="tiles">' +
+      var cmp = YP && !ong(Y);
+      h += midNote(Y) + '<div class="tiles">' +
         tile('취업대상자', fmtN(T.target) + '명', '남 ' + fmtN(T.targetM) + ' · 여 ' + fmtN(T.targetF)) +
-        tile('현장실습 참여', fmtN(T.part) + '명', '참여율 ' + pct(partR(Y)) + (YP ? ' ' + delta(partR(Y), partR(YP)) : '')) +
-        tile('채용전환', fmtN(T.conv) + '명', '전환율 ' + pct(convR(Y)) + (YP ? ' ' + delta(convR(Y), convR(YP)) : '')) +
+        tile('현장실습 참여', fmtN(T.part) + '명', '참여율 ' + pct(partR(Y)) + (cmp ? ' ' + delta(partR(Y), partR(YP)) : '')) +
+        tile('채용전환', fmtN(T.conv) + '명', '전환율 ' + pct(convR(Y)) + (cmp ? ' ' + delta(convR(Y), convR(YP)) : '')) +
+        (ong(Y) ? tile('지금 실습 중', fmtN(Dt.ongoing) + '건', '실습 ' + fmtN(Dt.n) + '건 중') : '') +
         tile('현장실습 기업', fmtN(T.comp) + '곳', '참여기업 ' + fmtN(T.compPart) + ' · 선도기업 ' + fmtN(T.compLead)) +
         tile('조기복교', pct(rate(early, Dt.n)), '실습 ' + fmtN(Dt.n) + '건 중 ' + fmtN(early) + '건') +
         tile('학생 만족도', Dt.satAvg == null ? '–' : Dt.satAvg.toFixed(2) + '점', '5점 만점 · 응답 ' + fmtN(Dt.satN) + '건') +
@@ -654,12 +662,13 @@
     var xs = allYears.slice().reverse();
     var serie = function (fn) { return regions.map(function (rg, i) { return { name: rg + (yearsOf(rg).length ? '' : '(반영 예정)'), cls: 's' + (i + 1), values: xs.map(function (yr) { return fn(get(rg, yr)); }) }; }); };
     var legend = function () { return '<div class="legend">' + regions.map(function (rg, i) { return '<span><i class="c' + (i + 1) + '"></i>' + esc(rg) + (yearsOf(rg).length ? '' : ' · 자료 반영 예정') + '</span>'; }).join('') + '</div>'; };
-    h += fsHead('tr', '연도별 추이', '광주·전남을 함께 보여 줍니다. 자료가 반영되지 않은 지역은 선 없이 범례에만 표시됩니다.');
-    h += '<div class="card"><h3>현장실습 참여율</h3>' + legend() + lineChart(xs.map(function (y) { return y + '학년도'; }), serie(partR), { W: W(), label: '연도별 현장실습 참여율' }) + '</div>';
-    h += '<div class="card"><h3>채용전환율</h3>' + legend() + lineChart(xs.map(function (y) { return y + '학년도'; }), serie(convR), { W: W(), label: '연도별 채용전환율' }) + '</div>';
+    var anyMid = F.years.some(ong);
+    h += fsHead('tr', '연도별 추이', '광주·전남을 함께 보여 줍니다. 자료가 반영되지 않은 지역은 선 없이 범례에만 표시됩니다.' + (anyMid ? ' ‘(중간)’은 학년도 중간 집계입니다.' : ''));
+    h += '<div class="card"><h3>현장실습 참여율</h3>' + legend() + lineChart(xs.map(yl), serie(partR), { W: W(), label: '연도별 현장실습 참여율' }) + '</div>';
+    h += '<div class="card"><h3>채용전환율</h3>' + legend() + lineChart(xs.map(yl), serie(convR), { W: W(), label: '연도별 채용전환율' }) + '</div>';
     h += '<div class="card"><h3>' + FS.year + '학년도 지역 비교</h3>' +
       hbar(regions.map(function (rg) { return [rg + ' 참여율', partR(get(rg, FS.year)), rg === FS.region]; }).concat(regions.map(function (rg) { return [rg + ' 채용전환율', convR(get(rg, FS.year)), rg === FS.region]; })), { W: W(), label: '지역별 참여율·채용전환율' }) + '</div>';
-    h += table(['학년도', '지역', '취업대상자', '참여', '참여율', '채용전환', '전환율', '기업 수'], [].concat.apply([], xs.slice().reverse().map(function (yr) { return regions.map(function (rg) { var y = get(rg, yr); return { em: yr === FS.year && rg === FS.region, c: y ? [yr + '학년도', esc(rg), fmtN(y.total.target), fmtN(y.total.part), pct(partR(y)), fmtN(y.total.conv), pct(convR(y)), fmtN(y.total.comp)] : [yr + '학년도', esc(rg), '–', '–', '반영 예정', '–', '–', '–'] }; }); })), { textCols: 2 });
+    h += table(['학년도', '지역', '취업대상자', '참여', '참여율', '채용전환', '전환율', '기업 수'], [].concat.apply([], xs.slice().reverse().map(function (yr) { return regions.map(function (rg) { var y = get(rg, yr); return { em: yr === FS.year && rg === FS.region, c: y ? [yl(yr), esc(rg), fmtN(y.total.target), fmtN(y.total.part), pct(partR(y)), fmtN(y.total.conv), pct(convR(y)), fmtN(y.total.comp)] : [yr + '학년도', esc(rg), '–', '–', '반영 예정', '–', '–', '–'] }; }); })), { textCols: 2 });
     h += '</section>';
 
     if (Y) {
@@ -669,14 +678,6 @@
       h += '<div class="card"><h3>유형별 참여 학생</h3>' + hbar(T2.types.map(function (t) { return [t[0], t[1] + t[2], false, '남 ' + t[1] + ' · 여 ' + t[2]]; }), { W: W(), unit: '명', label: '현장실습 유형별 참여 학생', metric: '' }) + '</div>';
       h += '<div class="card"><h3>기업 유형별 참여·채용전환</h3>' + hbar([].concat.apply([], T2.partByComp.map(function (p, i) { var c = T2.convByComp[i]; return [[p[0] + ' 참여', p[1] + p[2], false, '남 ' + p[1] + ' · 여 ' + p[2]], [p[0] + ' 채용전환', c[1] + c[2], true, '전환율 ' + pct(rate(c[1] + c[2], p[1] + p[2]))]]; })), { W: W(), unit: '명', label: '기업 유형별 참여와 채용전환', metric: '' }) +
         '<p class="m0 small muted">현장실습 기업 ' + fmtN(T2.comp) + '곳(참여기업 ' + fmtN(T2.compPart) + ', 선도기업 ' + fmtN(T2.compLead) + ')</p></div>';
-      h += '</section>';
-
-      /* 4. 학교별 */
-      var sc = Y.schools.slice();
-      h += fsHead('sc', '학교별 현황', '학교별 참여율(참여 ÷ 취업대상자)과 채용전환 학생 수입니다.');
-      h += '<div class="card"><h3>학교별 현장실습 참여율</h3>' + hbar(sc.slice().sort(function (a, b) { return rate(b.part, b.target) - rate(a.part, a.target); }).map(function (s) { return [s.school, rate(s.part, s.target), false, '참여 ' + s.part + '명 / 대상 ' + s.target + '명']; }), { W: W(), label: '학교별 현장실습 참여율', metric: '참여율', avg: partR(Y), avgLabel: FS.region }) + '</div>';
-      h += '<div class="card"><h3>학교별 채용전환 학생</h3>' + hbar(sc.slice().sort(function (a, b) { return b.conv - a.conv; }).map(function (s) { return [s.school, s.conv, false, '참여 ' + s.part + '명 중 ' + s.conv + '명']; }), { W: W(), unit: '명', label: '학교별 채용전환 학생', metric: '' }) + '</div>';
-      h += table(['학교', '졸업자', '취업대상자', '참여', '참여율', '채용전환', '전환율'], sc.map(function (s) { return { c: [esc(s.school), fmtN(s.grad), fmtN(s.target), fmtN(s.part), pct(rate(s.part, s.target)), fmtN(s.conv), pct(rate(s.conv, s.part))] }; }), { title: '학교별 표로 보기' });
       h += '</section>';
 
       /* 5. 실습 분야 */
@@ -702,11 +703,21 @@
         '<div class="tile"><span class="tl">사고 발생</span><span class="tv">' + fmtN(D2.accident) + '건</span><span class="td">산재 처리 ' + fmtN(D2.injury) + '건</span></div>' +
         '<div class="tile"><span class="tl">협약 위반</span><span class="tv">' + fmtN(D2.breach) + '건</span><span class="td">하이파이브 기록 기준</span></div></div>';
       h += '</section>';
+
+      /* 9. 학교별(전체 다음) */
+      var sc = Y.schools.slice();
+      h += band('R', '학교별', '학교 단위로 나눠 본 통계') + midNote(Y);
+      h += fsHead('sc', '학교별 현황', '학교별 참여율(참여 ÷ 취업대상자)과 채용전환 학생 수입니다.');
+      h += '<div class="card"><h3>학교별 현장실습 참여율</h3>' + hbar(sc.slice().sort(function (a, b) { return rate(b.part, b.target) - rate(a.part, a.target); }).map(function (s) { return [s.school, rate(s.part, s.target), false, '참여 ' + s.part + '명 / 대상 ' + s.target + '명']; }), { W: W(), label: '학교별 현장실습 참여율', metric: '참여율', avg: partR(Y), avgLabel: FS.region }) + '</div>';
+      h += '<div class="card"><h3>학교별 채용전환 학생</h3>' + hbar(sc.slice().sort(function (a, b) { return b.conv - a.conv; }).map(function (s) { return [s.school, s.conv, false, '참여 ' + s.part + '명 중 ' + s.conv + '명']; }), { W: W(), unit: '명', label: '학교별 채용전환 학생', metric: '' }) + '</div>';
+      h += table(['학교', '졸업자', '취업대상자', '참여', '참여율', '채용전환', '전환율'], sc.map(function (s) { return { c: [esc(s.school), fmtN(s.grad), fmtN(s.target), fmtN(s.part), pct(rate(s.part, s.target)), fmtN(s.conv), pct(rate(s.conv, s.part))] }; }), { title: '학교별 표로 보기', textCols: 1 });
+      h += '</section>';
+
     } else {
-      ['ty', 'sc', 'fd', 'cd', 'en', 'sf'].forEach(function (id) { var t = SECS.filter(function (s) { return s[0] === id; })[0]; h += fsHead(id, t[1], '') + '<div class="card">' + pend(FS.region) + '</div></section>'; });
+      ['ty', 'fd', 'cd', 'en', 'sf', 'sc'].forEach(function (id) { var t = SECS.filter(function (s) { return s[0] === id; })[0]; h += (id === 'sc' ? band('R', '학교별', '학교 단위로 나눠 본 통계') : '') + fsHead(id, t[1], '') + '<div class="card">' + pend(FS.region) + '</div></section>'; });
     }
 
-    /* 9. 용어 */
+    /* 10. 용어 */
     h += fsHead('df', '용어', '') + '<dl class="defs">' + (F.definitions || []).map(function (d) { return '<dt>' + esc(d[0]) + '</dt><dd>' + esc(d[1]) + '</dd>'; }).join('') + '</dl></section>';
 
     el.innerHTML = h;
@@ -729,75 +740,95 @@
   };
   V.fpst = function () { location.replace('#/stats/fp'); };
 
-  /* 단위학교별: 학교 하나를 골라 연도별 취업률·현장실습을 광주 전체와 비교 */
+  /* 단위학교별: 먼저 광주 전체 학교를 비교하고, 다음으로 고른 학교 하나를 연도별로 본다 */
   var SV = { school: null, year: null, metric: 'rateM' };
   function schoolView(el) {
     var ES = (D().stats.schools || []).slice().sort(function (a, b) { return a.year - b.year; });
     var FY = ((D().fpst && D().fpst.years) || []).filter(function (y) { return y.region === '광주'; });
-    if (!ES.length) { el.innerHTML = '<p class="muted">학교별 자료가 없습니다.</p>'; return; }
-    var names = []; ES.forEach(function (y) { y.schools.forEach(function (s) { if (names.indexOf(s.school) < 0) names.push(s.school); }); });
+    if (!ES.length && !FY.length) { el.innerHTML = '<p class="muted">학교별 자료가 없습니다.</p>'; return; }
+    var names = [];
+    ES.forEach(function (y) { y.schools.forEach(function (s) { if (names.indexOf(s.school) < 0) names.push(s.school); }); });
+    FY.forEach(function (y) { y.schools.forEach(function (s) { if (names.indexOf(s.school) < 0) names.push(s.school); }); });
     names.sort();
     if (!SV.school || names.indexOf(SV.school) < 0) SV.school = MJG.store.get('mjg.svSchool') || names[0];
     if (names.indexOf(SV.school) < 0) SV.school = names[0];
-    var years = ES.map(function (y) { return y.year; });
+    var years = [];
+    ES.concat(FY).forEach(function (y) { if (years.indexOf(y.year) < 0) years.push(y.year); });
+    years.sort(function (a, b) { return a - b; });
     if (SV.year == null || years.indexOf(SV.year) < 0) SV.year = years[years.length - 1];
     var W = function () { var v = el.clientWidth ? el.clientWidth - 64 : 680; return Math.max(300, Math.min(880, v)); };
-    var es = function (yr, nm) { var y = ES.filter(function (x) { return x.year === yr; })[0]; return y ? y.schools.filter(function (s) { return s.school === nm; })[0] : null; };
-    var fs = function (yr, nm) { var y = FY.filter(function (x) { return x.year === yr; })[0]; return y ? y.schools.filter(function (s) { return s.school === nm; })[0] : null; };
-    var fy = function (yr) { return FY.filter(function (x) { return x.year === yr; })[0]; };
+    var ey = function (yr) { return ES.filter(function (x) { return x.year === yr; })[0] || null; };
+    var fy = function (yr) { return FY.filter(function (x) { return x.year === yr; })[0] || null; };
+    var es = function (yr, nm) { var y = ey(yr); return y ? y.schools.filter(function (s) { return s.school === nm; })[0] : null; };
+    var fs = function (yr, nm) { var y = fy(yr); return y ? y.schools.filter(function (s) { return s.school === nm; })[0] : null; };
     var rate = function (a, b) { return b ? a / b * 100 : null; };
-    var xs = years.map(function (y) { return y + '학년도'; });
-    var cur = es(SV.year, SV.school), curF = fs(SV.year, SV.school), gj = ES.filter(function (x) { return x.year === SV.year; })[0], gjF = fy(SV.year);
-    var prevY = SV.year - 1, pv = es(prevY, SV.school);
-    var h = '<div class="stickybar"><label class="sel svsel">학교 <select id="svSchool">' + names.map(function (n) { return '<option' + (n === SV.school ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></label>' +
-      '<div class="pubseg" role="group" aria-label="학년도">' + years.slice().reverse().map(function (y) { var o = ES.filter(function (x) { return x.year === y; })[0]; return '<button type="button" class="fchip" data-svyear="' + y + '" aria-pressed="' + (y === SV.year) + '">' + y + '학년도<small> ' + esc(o.base) + ' 기준</small></button>'; }).join('') + '</div></div>';
-    h += '<div class="cohort"><span class="cbig">' + esc(SV.school) + '</span><span>' + SV.year + '학년도 3학년 · ' + (SV.year + 1) + '년 KEDI 발표와 같은 대상</span></div>';
-    /* 한눈에 */
-    h += '<section class="ssec" id="sv-ov"><h2 class="sh">한눈에 보기</h2>';
-    if (!cur) h += '<div class="card"><p class="muted m0">이 학년도 자료가 없습니다.</p></div>';
+    var mid = function (yr) { var f = fy(yr); return !!(f && f.ongoing); };
+    var baseOf = function (yr) { var f = fy(yr), e = ey(yr); return (f && f.base) || (e && e.base) || ''; };
+    var yl = function (yr) { return yr + '학년도' + (mid(yr) ? '(중간)' : ''); };
+    var xs = years.map(yl);
+    var gj = ey(SV.year), gjF = fy(SV.year), cur = es(SV.year, SV.school), curF = fs(SV.year, SV.school), pv = es(SV.year - 1, SV.school);
+    var noEmp = '취업률은 ' + (SV.year + 1) + '. 2. 1. 기준 자료가 나오면 반영합니다.';
+    var band = function (k, t, sub) { return '<div class="scopeband sc' + k + '"><span class="scope sc' + k + '">' + t + '</span><span>' + sub + '</span></div>'; };
+    var tile = function (l, v, d) { return '<div class="tile"><span class="tl">' + l + '</span><span class="tv">' + v + '</span><span class="td">' + d + '</span></div>'; };
+
+    var h = '<div class="stickybar"><div class="pubseg" role="group" aria-label="학년도">' + years.slice().reverse().map(function (y) { return '<button type="button" class="fchip" data-svyear="' + y + '" aria-pressed="' + (y === SV.year) + '">' + y + '학년도<small> ' + esc(baseOf(y)) + ' 기준' + (mid(y) ? '·중간' : '') + '</small></button>'; }).join('') + '</div>' +
+      '<label class="sel svsel">학교 <select id="svSchool">' + names.map(function (n) { return '<option' + (n === SV.school ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></label></div>';
+    h += '<div class="cohort"><span class="cbig">' + SV.year + '학년도 3학년</span><span>' + esc(baseOf(SV.year)) + ' 기준' + (mid(SV.year) ? ' <span class="tag mid">중간 집계</span>' : '') + ' · 광주</span></div>';
+    h += '<nav class="secnav scopenav" aria-label="바로가기"><div class="scrow"><span class="scope scN">전체</span><button type="button" class="fchip" data-svgo="cmp">학교 비교</button></div>' +
+      '<div class="scrow"><span class="scope scR">학교별</span><button type="button" class="fchip" data-svgo="ov">한눈에 보기</button><button type="button" class="fchip" data-svgo="tr">연도별 추이</button></div></nav>';
+    if (mid(SV.year)) h += '<p class="notebox">' + esc(baseOf(SV.year)) + ' 기준 <b>중간 집계</b>입니다. 실습 중인 학생이 있어 현장실습 참여·채용전환 수는 앞으로 늘어나며, ' + noEmp + '</p>';
+
+    /* 1. 전체 학교 비교 */
+    var MET = [['rateM', '남학생 취업률', '%'], ['rateF', '여학생 취업률', '%'], ['part', '현장실습 참여율', '%'], ['conv', '채용전환 학생', '명']];
+    var val = function (key, nm) { if (key === 'rateM' || key === 'rateF') { var x = es(SV.year, nm); return x ? x[key] : null; } var f = fs(SV.year, nm); if (!f) return null; return key === 'part' ? rate(f.part, f.target) : f.conv; };
+    var has = function (key) { return names.some(function (n) { return val(key, n) != null; }); };
+    var m = MET.filter(function (x) { return x[0] === SV.metric && has(x[0]); })[0] || MET.filter(function (x) { return has(x[0]); })[0] || MET[0];
+    var rows = names.map(function (n) { return [n, val(m[0], n), n === SV.school]; }).filter(function (r0) { return r0[1] != null; }).sort(function (a, b) { return b[1] - a[1]; });
+    var avg = m[0] === 'part' ? (gjF ? rate(gjF.total.part, gjF.total.target) : null) : m[2] === '%' && gj ? gj.empRate : null;
+    h += band('N', '광주 전체 학교', '모든 학교를 한 화면에서 비교');
+    h += '<section class="ssec" id="sv-cmp"><h2 class="sh">' + SV.year + '학년도 학교 비교</h2><div class="seg" role="group" aria-label="비교 지표">' + MET.map(function (x) { var ok = has(x[0]); return '<button type="button" data-svm="' + x[0] + '" aria-pressed="' + (x[0] === m[0]) + '"' + (ok ? '' : ' disabled title="이 학년도 자료 없음"') + '>' + x[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="card">' + (rows.length ? hbar(rows, { W: W(), unit: m[2], label: '학교별 ' + m[1], metric: m[1], avg: avg, avgLabel: '광주' }) : '<p class="muted m0">이 학년도 자료가 없습니다.</p>') + '<p class="m0 small muted">주황색 막대가 아래에서 고른 학교입니다.' + (m[0] === 'rateM' || m[0] === 'rateF' ? ' 해당 성별 학생이 없는 학교는 빠집니다.' : '') + (mid(SV.year) ? ' ' + noEmp : '') + '</p></div>';
+    h += table(['학교', '취업대상자', '남 취업률', '여 취업률', '현장실습 참여', '참여율', '채용전환'], names.map(function (n) { var x = es(SV.year, n) || {}, f = fs(SV.year, n) || {}; return { em: n === SV.school, c: [esc(n), fmtN(x.target != null ? x.target : f.target), pct(x.rateM), pct(x.rateF), fmtN(f.part), pct(f.part != null ? rate(f.part, f.target) : null), fmtN(f.conv)] }; }), { title: '전체 학교 표로 보기', open: true });
+    h += '</section>';
+
+    /* 2. 고른 학교 */
+    h += band('R', '학교별', esc(SV.school));
+    h += '<section class="ssec" id="sv-ov"><h2 class="sh">' + esc(SV.school) + ' 한눈에 보기</h2>';
+    if (!cur && !curF) h += '<div class="card"><p class="muted m0">이 학년도 자료가 없습니다.</p></div>';
     else {
-      var tile = function (l, v, d) { return '<div class="tile"><span class="tl">' + l + '</span><span class="tv">' + v + '</span><span class="td">' + d + '</span></div>'; };
       h += '<div class="tiles">' +
-        tile('남학생 취업률', pct(cur.rateM), cur.rateM == null ? '남학생 없음' : '광주 전체 ' + pct(gj.empRate) + (pv ? ' · 전년 ' + delta(cur.rateM, pv.rateM) : '')) +
-        tile('여학생 취업률', pct(cur.rateF), cur.rateF == null ? '여학생 없음' : '광주 전체 ' + pct(gj.empRate) + (pv ? ' · 전년 ' + delta(cur.rateF, pv.rateF) : '')) +
-        tile('졸업자 · 취업대상자', fmtN(cur.grad) + ' · ' + fmtN(cur.target) + '명', '남 ' + fmtN(cur.targetM) + ' · 여 ' + fmtN(cur.targetF)) +
-        (curF ? tile('현장실습 참여', fmtN(curF.part) + '명', '참여율 ' + pct(rate(curF.part, curF.target)) + ' · 광주 ' + pct(rate(gjF.total.part, gjF.total.target))) +
+        tile('남학생 취업률', pct(cur && cur.rateM), !cur ? noEmp : cur.rateM == null ? '남학생 없음' : '광주 전체 ' + pct(gj.empRate) + (pv ? ' · 전년 ' + delta(cur.rateM, pv.rateM) : '')) +
+        tile('여학생 취업률', pct(cur && cur.rateF), !cur ? noEmp : cur.rateF == null ? '여학생 없음' : '광주 전체 ' + pct(gj.empRate) + (pv ? ' · 전년 ' + delta(cur.rateF, pv.rateF) : '')) +
+        (cur ? tile('졸업자 · 취업대상자', fmtN(cur.grad) + ' · ' + fmtN(cur.target) + '명', '남 ' + fmtN(cur.targetM) + ' · 여 ' + fmtN(cur.targetF)) : tile('취업대상자', fmtN(curF.target) + '명', '남 ' + fmtN(curF.targetM) + ' · 여 ' + fmtN(curF.targetF))) +
+        (curF && gjF ? tile('현장실습 참여', fmtN(curF.part) + '명', '참여율 ' + pct(rate(curF.part, curF.target)) + ' · 광주 ' + pct(rate(gjF.total.part, gjF.total.target))) +
           tile('채용전환', fmtN(curF.conv) + '명', '전환율 ' + pct(rate(curF.conv, curF.part)) + ' · 광주 ' + pct(rate(gjF.total.conv, gjF.total.part))) : '') +
         '</div>';
     }
     h += '</section>';
-    /* 연도별 추이 */
-    h += '<section class="ssec" id="sv-tr"><h2 class="sh">연도별 추이</h2>';
+    h += '<section class="ssec" id="sv-tr"><h2 class="sh">' + esc(SV.school) + ' 연도별 추이</h2>';
     h += '<div class="card"><h3>취업률(남·여)과 광주 전체</h3><div class="legend"><span><i class="c1"></i>남학생</span><span><i class="c2"></i>여학생</span><span><i class="c3"></i>광주 전체</span></div>' +
       lineChart(xs, [{ name: '남', cls: 's1', values: years.map(function (y) { var x = es(y, SV.school); return x ? x.rateM : null; }) },
                      { name: '여', cls: 's2', values: years.map(function (y) { var x = es(y, SV.school); return x ? x.rateF : null; }) },
-                     { name: '광주', cls: 's3', values: ES.map(function (y) { return y.empRate; }) }], { W: W(), label: SV.school + ' 취업률 추이', max: 100 }) + '</div>';
+                     { name: '광주', cls: 's3', values: years.map(function (y) { var t = ey(y); return t ? t.empRate : null; }) }], { W: W(), label: SV.school + ' 취업률 추이', max: 100 }) + '</div>';
     if (FY.length) h += '<div class="card"><h3>현장실습 참여율·채용전환율</h3><div class="legend"><span><i class="c1"></i>참여율</span><span><i class="c2"></i>채용전환율</span><span><i class="c3"></i>광주 참여율</span></div>' +
       lineChart(xs, [{ name: '참여율', cls: 's1', values: years.map(function (y) { var x = fs(y, SV.school); return x ? rate(x.part, x.target) : null; }) },
                      { name: '채용전환율', cls: 's2', values: years.map(function (y) { var x = fs(y, SV.school); return x && x.part ? rate(x.conv, x.part) : null; }) },
                      { name: '광주 참여율', cls: 's3', values: years.map(function (y) { var t = fy(y); return t ? rate(t.total.part, t.total.target) : null; }) }], { W: W(), label: SV.school + ' 현장실습 추이', max: 100 }) + '</div>';
-    h += table(['학년도', '졸업자', '취업대상자', '남 취업률', '여 취업률', '현장실습 참여', '참여율', '채용전환'], years.slice().reverse().map(function (y) { var x = es(y, SV.school) || {}, f = fs(y, SV.school) || {}; return { em: y === SV.year, c: [y + '학년도', fmtN(x.grad), fmtN(x.target), pct(x.rateM), pct(x.rateF), fmtN(f.part), pct(f.part != null ? rate(f.part, f.target) : null), fmtN(f.conv)] }; }), { title: '연도별 표로 보기' });
+    h += table(['학년도', '졸업자', '취업대상자', '남 취업률', '여 취업률', '현장실습 참여', '참여율', '채용전환'], years.slice().reverse().map(function (y) { var x = es(y, SV.school) || {}, f = fs(y, SV.school) || {}; return { em: y === SV.year, c: [yl(y), fmtN(x.grad), fmtN(x.target != null ? x.target : f.target), pct(x.rateM), pct(x.rateF), fmtN(f.part), pct(f.part != null ? rate(f.part, f.target) : null), fmtN(f.conv)] }; }), { title: '연도별 표로 보기' });
     h += '</section>';
-    /* 학교 비교 */
-    var MET = [['rateM', '남학생 취업률', '%'], ['rateF', '여학생 취업률', '%'], ['part', '현장실습 참여율', '%'], ['conv', '채용전환 학생', '명']];
-    var m = MET.filter(function (x) { return x[0] === SV.metric; })[0] || MET[0];
-    var val = function (nm) { if (m[0] === 'rateM' || m[0] === 'rateF') { var x = es(SV.year, nm); return x ? x[m[0]] : null; } var f = fs(SV.year, nm); if (!f) return null; return m[0] === 'part' ? rate(f.part, f.target) : f.conv; };
-    var rows = names.map(function (n) { return [n, val(n), n === SV.school]; }).filter(function (r0) { return r0[1] != null; }).sort(function (a, b) { return b[1] - a[1]; });
-    var avg = m[0] === 'part' ? (gjF ? rate(gjF.total.part, gjF.total.target) : null) : m[2] === '%' ? gj.empRate : null;
-    h += '<section class="ssec" id="sv-cmp"><h2 class="sh">' + SV.year + '학년도 학교 비교</h2><div class="seg" role="group" aria-label="비교 지표">' + MET.map(function (x) { return '<button type="button" data-svm="' + x[0] + '" aria-pressed="' + (x[0] === m[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>' +
-      '<div class="card">' + hbar(rows, { W: W(), unit: m[2], label: '학교별 ' + m[1], metric: m[1], avg: avg, avgLabel: '광주' }) + '<p class="m0 small muted">주황 막대가 고른 학교입니다.' + (m[0] === 'rateM' || m[0] === 'rateF' ? ' 해당 성별 학생이 없는 학교는 빠집니다.' : '') + '</p></div></section>';
     el.innerHTML = h;
     bindTips(el);
     var redraw = function () { var y = window.scrollY; MJG._keepScroll = true; schoolView(el); window.scrollTo(0, y); };
     el.querySelector('#svSchool').addEventListener('change', function () { SV.school = this.value; MJG.store.set('mjg.svSchool', SV.school); redraw(); });
     el.querySelectorAll('[data-svyear]').forEach(function (b) { b.addEventListener('click', function () { SV.year = +b.getAttribute('data-svyear'); redraw(); }); });
     el.querySelectorAll('[data-svm]').forEach(function (b) { b.addEventListener('click', function () { SV.metric = b.getAttribute('data-svm'); redraw(); }); });
+    el.querySelectorAll('[data-svgo]').forEach(function (b) { b.addEventListener('click', function () { var t = el.querySelector('#sv-' + b.getAttribute('data-svgo')); if (t) { var bar = el.querySelector('.stickybar'); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - (bar ? bar.offsetHeight + 70 : 70), behavior: 'smooth' }); } }); });
   }
 
   /* ───────── 더보기(설치·설정·정보) ───────── */
   V.more = function (el) {
     var d = D(), plat = MJG.platform(), C = window.MJG_CONFIG || {};
-    var fi = MJG.fsIndex(), th = MJG.theme();
+    var fi = MJG.fsIndex();
     var osc = [
       ['windows', '윈도우 PC·노트북', ['크롬 또는 엣지로 앱 주소에 접속합니다.', '주소창 오른쪽의 ‘앱 설치’ 아이콘(모니터 모양)을 누르거나, 메뉴(⋯) → 앱 → ‘이 사이트를 앱으로 설치’를 고릅니다.', '시작 메뉴·바탕화면에 ‘미래 JOB GO’가 생깁니다.']],
       ['mac', '맥(macOS)', ['크롬·엣지: 주소창의 설치 아이콘 또는 메뉴 → ‘미래 JOB GO 설치’', '사파리(macOS 14 이상): 파일 메뉴 → ‘Dock에 추가’', 'Launchpad·Dock에서 실행합니다.']],
@@ -814,7 +845,7 @@
       '<p class="muted">앱 장터(구글플레이·앱스토어)를 거치지 않는 웹앱(PWA) 방식이라 비용·회원가입 없이 설치되며, 한 번 열면 인터넷이 없어도 저장된 자료를 볼 수 있습니다.</p>' +
       '<div class="oscards">' + osc.slice().sort(function (a, b) { return (b[0] === plat) - (a[0] === plat); }).map(function (o) { return '<div class="oscard' + (o[0] === plat ? ' me' : '') + '"><h3>' + o[1] + (o[0] === plat ? ' <span class="tag">지금 기기</span>' : '') + '</h3><ol class="steps">' + o[2].map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol></div>'; }).join('') + '</div></div>' +
       '<div class="card"><div class="setrow"><span class="sl"><b>글자 크기</b><small>현재 ' + [14, 15, 16, 17, 18, 20][fi] + 'px</small></span><span class="fsz"><button type="button" id="fsm" aria-label="글자 작게">가−</button><button type="button" id="fsp" aria-label="글자 크게">가+</button></span></div>' +
-      '<div class="setrow"><span class="sl"><b>화면 테마</b><small>기기 설정을 따르거나 직접 고릅니다</small></span><span class="seg" role="group" aria-label="화면 테마">' + [['auto', '자동'], ['light', '밝게'], ['dark', '어둡게']].map(function (t) { return '<button type="button" data-t="' + t[0] + '" aria-pressed="' + (th === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</span></div></div>' +
+'</div>' +
       '<div class="card sect"><h2>자료 정보</h2><dl class="kv">' +
       '<dt>자료 버전</dt><dd>' + esc(d.meta.label || '') + ' (버전 ' + esc(d.meta.version) + ')</dd>' +
       '<dt>발행</dt><dd>' + esc(MJG.fmtDate(d.meta.publishedAt)) + ' · ' + esc(d.meta.publisher) + '</dd>' +
@@ -833,7 +864,6 @@
     if (ib) ib.addEventListener('click', function () { var e = MJG.installEvt; if (!e) return; e.prompt(); e.userChoice.then(function () { MJG.installEvt = null; V.more(el); }); });
     el.querySelector('#fsm').addEventListener('click', function () { MJG.setFs(MJG.fsIndex() - 1); MJG._keepScroll = true; V.more(el); });
     el.querySelector('#fsp').addEventListener('click', function () { MJG.setFs(MJG.fsIndex() + 1); MJG._keepScroll = true; V.more(el); });
-    el.querySelectorAll('[data-t]').forEach(function (b) { b.addEventListener('click', function () { MJG.setTheme(b.getAttribute('data-t')); V.more(el); }); });
     el.querySelector('#btnChk').addEventListener('click', function () { MJG.checkUpdate(true).then(function () { V.more(el); }); });
     el.querySelector('#btnReset').addEventListener('click', function () {
       ['mjg.content.v1', 'mjg.chk.student', 'mjg.chk.teacher', 'mjg.chk.school', 'mjg.chk.company', 'mjg.lastcheck'].forEach(MJG.store.del);
