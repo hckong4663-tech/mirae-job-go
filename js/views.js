@@ -374,7 +374,7 @@
   var SS = { pub: null, lens: null, region: null, metric: 'rate', subjSort: 'rate', trendType: '전체' };
   var SEC = [
     ['ov', '한눈에 보기', 'N'], ['tr', '연도별 추이', 'N'], ['ty', '학교유형·성별', 'N'], ['sj', '계열(교과군)별', 'N'], ['wp', '어디에 취업했나', 'N'], ['rt', '취업 유지', 'N'],
-    ['gj', '한눈에 보기', 'R'], ['rg', '시도별 비교·추이', 'R'], ['sc', '광주 학교별', 'R'], ['df', '용어·출처', '']
+    ['gj', '한눈에 보기', 'R'], ['gn', '광주·전남 진로·유지취업', 'R'], ['rg', '시도별 비교·추이', 'R'], ['sc', '광주 학교별', 'R'], ['df', '용어·출처', '']
   ];
   function rel() { var r = D().stats.releases || []; var x = null; r.forEach(function (k) { if (k.pub === SS.pub) x = k; }); return x || r[0]; }
   function relPrev(R) { var x = null; (D().stats.releases || []).forEach(function (k) { if (k.pub === R.pub - 1) x = k; }); return x; }
@@ -564,6 +564,56 @@
     /* 지역 한눈에(광주 기본, 시도 선택) */
     h += sectHead('gj', '한눈에 보기(지역)', '광주가 기본으로 나옵니다. 오른쪽에서 다른 시도를 고르면 아래 지역 통계가 그 시도 기준으로 바뀝니다.') + gjCard + gjRet + '</section>';
 
+    /* 지역: 광주·전남 진로(취업·진학·진로미결정)와 1년 유지취업률 추이 */
+    if (show('gn')) {
+      var RH = st.regionHist || { career: [], ret: [] }, RG = [['광주', 's2', 'c2'], ['전남', 's3', 'c3'], ['전국', 's1', 'c1']];
+      var cpubs = [];
+      rels.forEach(function (r) { if (cpubs.indexOf(r.pub) < 0) cpubs.push(r.pub); });
+      (RH.career || []).forEach(function (r) { if (cpubs.indexOf(r.pub) < 0) cpubs.push(r.pub); });
+      cpubs.sort(function (a, b) { return a - b; });
+      var relOf = function (y) { return rels.filter(function (k) { return k.pub === y; })[0]; };
+      var car = function (y, sd) {
+        var r0 = relOf(y);
+        if (r0) { var v = sd === '전국' ? natAll(r0) : sidoOf(r0, sd); if (v && v.grad) return v; }
+        return (RH.career || []).filter(function (x) { return x.pub === y && x.sido === sd; })[0] || null;
+      };
+      var undec = function (v) { return v && v.grad && v.unemp != null ? v.unemp / v.grad * 100 : null; };
+      var cxs = cpubs.map(String), csub = function (i) { return '(' + String(cpubs[i] - 1).slice(2) + '학년도)'; }, ctip = function (i) { return cpubs[i] + '년 발표 · ' + (cpubs[i] - 1) + '학년도 3학년'; };
+      var lg = '<div class="legend">' + RG.map(function (g) { return '<span><i class="' + g[2] + '"></i>' + g[0] + '</span>'; }).join('') + '</div>';
+      var ser = function (f) { return RG.map(function (g) { return { name: g[0], cls: g[1], values: cpubs.map(function (y) { return f(car(y, g[0])); }) }; }); };
+      h += sectHead('gn', '광주·전남 진로·유지취업(지역)', '광주·전남과 전국을 함께 봅니다. 가로축은 <b>발표연도</b>, 괄호는 대상 학년도(3학년)입니다. 2021·2022년 발표 값은 한국교육개발원 교육통계서비스 자료입니다.');
+      // 고른 발표연도의 진로 구성
+      var KIND = [['emp', '취업', 'sb1', 'c1'], ['adv', '진학', 'sb3', 'c3'], ['enl', '입대', 'sb4', 'c4'], ['exc', '제외인정', 'sb5', 'c5'], ['unemp', '진로미결정', 'sb6', 'c6']];
+      h += '<div class="card chartcard"><h3>' + R.pub + '년 발표 졸업 후 진로 <small class="muted">(' + esc(R.cohort) + ')</small></h3>' +
+        '<div class="legend">' + KIND.map(function (k) { return '<span><i class="' + k[3] + '"></i>' + k[1] + '</span>'; }).join('') + '</div>' +
+        RG.map(function (g) { var v = car(R.pub, g[0]); if (!v) return ''; return '<div class="stackrow"><b>' + g[0] + '</b><div class="stackbar" role="img" aria-label="' + g[0] + ' ' + KIND.map(function (k) { return k[1] + ' ' + (v[k[0]] / v.grad * 100).toFixed(1) + '%'; }).join(', ') + '">' +
+          KIND.map(function (k) { var w = v[k[0]] / v.grad * 100; return w > 0 ? '<span class="' + k[2] + '" data-w="' + w.toFixed(2) + '" title="' + k[1] + ' ' + fmtN(v[k[0]]) + '명(' + w.toFixed(1) + '%)"></span>' : ''; }).join('') + '</div>' +
+          '<p class="m0 small">졸업자 ' + fmtN(v.grad) + '명 · 취업 ' + fmtN(v.emp) + ' · 진학 ' + fmtN(v.adv) + ' · 입대 ' + fmtN(v.enl) + ' · 제외인정 ' + fmtN(v.exc) + ' · <b class="down">진로미결정 ' + fmtN(v.unemp) + '명(' + pct(undec(v)) + ')</b></p></div>'; }).join('') + '</div>';
+      // 추이 그래프 3개
+      h += '<div class="card chartcard"><h3>취업률 추이</h3>' + lg + lineChart(cxs, ser(function (v) { return v ? v.rate : null; }), { label: '광주·전남·전국 취업률 추이', max: 70, tipTitle: ctip, sub: csub }) + '</div>';
+      h += '<div class="card chartcard"><h3>진학률 추이</h3>' + lg + lineChart(cxs, ser(function (v) { return v ? v.advRate : null; }), { label: '광주·전남·전국 진학률 추이', max: 70, tipTitle: ctip, sub: csub }) + '</div>';
+      h += '<div class="card chartcard"><h3>진로미결정 비율 추이 <small class="muted">(진로미결정자 ÷ 졸업자)</small></h3>' + lg + lineChart(cxs, ser(undec), { label: '광주·전남·전국 진로미결정 비율 추이', max: 40, tipTitle: ctip, sub: csub }) +
+        table(['발표연도', '지역', '졸업자', '취업자', '취업률', '진학자', '진학률', '입대', '제외인정', '진로미결정', '비율'], [].concat.apply([], cpubs.slice().reverse().map(function (y) { return RG.map(function (g) { var v = car(y, g[0]); return v ? { em: y === R.pub && g[0] !== '전국', c: [y + '년(' + (y - 1) + '학년도)', g[0], fmtN(v.grad), fmtN(v.emp), pct(v.rate), fmtN(v.adv), pct(v.advRate), fmtN(v.enl), fmtN(v.exc), fmtN(v.unemp), pct(undec(v))] } : null; }).filter(Boolean); })), { title: '연도별·지역별 표로 보기', textCols: 2 }) + '</div>';
+      // 유지취업률(6개월·1년)
+      var rpubs = [];
+      rels.forEach(function (r) { if (r.ret && rpubs.indexOf(r.pub) < 0) rpubs.push(r.pub); });
+      (RH.ret || []).forEach(function (r) { if (rpubs.indexOf(r.pub) < 0) rpubs.push(r.pub); });
+      rpubs.sort(function (a, b) { return a - b; });
+      var retOf = function (y, sd) {
+        var r0 = relOf(y);
+        if (r0 && r0.ret) { var v = sd === '전국' ? (r0.ret.type || []).filter(function (x) { return x.type === '전체'; })[0] : (r0.ret.sido || []).filter(function (x) { return x.sido === sd; })[0]; if (v) return { cohort: r0.ret.cohort, ins: v.ins, rate1: v.rate1, rate2: v.rate2 }; }
+        return (RH.ret || []).filter(function (x) { return x.pub === y && x.sido === sd; })[0] || null;
+      };
+      var rxs = rpubs.map(function (y) { return (y - 2) + '학년도'; }), rsub = function (i) { return '(' + rpubs[i] + '년 발표)'; }, rtip = function (i) { return (rpubs[i] - 2) + '학년도 3학년(' + (rpubs[i] - 1) + '년 1~2월 졸업) · ' + rpubs[i] + '년 발표'; };
+      var rser = function (k) { return RG.map(function (g) { return { name: g[0], cls: g[1], values: rpubs.map(function (y) { var v = retOf(y, g[0]); return v ? v[k] : null; }) }; }); };
+      h += '<div class="card chartcard"><h3>1년 이상 취업 유지율(1년 유지취업률) 추이</h3><p class="cap m0">가로축은 <b>대상 학년도</b>입니다. 유지취업률은 졸업 다음 해 발표에 실립니다(예: 2024학년도 졸업생 → 2026년 발표).</p>' + lg +
+        lineChart(rxs, rser('rate2'), { label: '광주·전남·전국 1년 유지취업률 추이', max: 90, tipTitle: rtip, sub: rsub }) + '</div>';
+      h += '<div class="card chartcard"><h3>6개월 유지취업률 추이</h3>' + lg + lineChart(rxs, rser('rate1'), { label: '광주·전남·전국 6개월 유지취업률 추이', max: 100, tipTitle: rtip, sub: rsub }) +
+        table(['대상 학년도', '지역', '보험가입 취업자', '6개월 유지', '1년 유지'], [].concat.apply([], rpubs.slice().reverse().map(function (y) { return RG.map(function (g) { var v = retOf(y, g[0]); return v ? { em: y === R.pub && g[0] !== '전국', c: [(y - 2) + '학년도(' + y + '년 발표)', g[0], fmtN(v.ins), pct(v.rate1), pct(v.rate2)] } : null; }).filter(Boolean); })), { title: '유지취업률 표로 보기', textCols: 2, open: true }) +
+        '<p class="cap">빈 칸(–)은 제공받은 자료에 값이 없는 경우입니다.</p></div>';
+      h += '</section>';
+    }
+
     /* 8. 용어·출처 */
     if (show('df')) {
       h += sectHead('df', '용어·출처', '');
@@ -580,7 +630,7 @@
     h.slice(head.length).split(/(?=<section class="ssec" id="ss-)/).forEach(function (sec) { var m = /^<section class="ssec" id="ss-(\w+)"/.exec(sec); if (m) parts[m[1]] = sec; });
     var band = function (k, t, sub) { return '<div class="scopeband sc' + k + '"><span class="scope sc' + k + '">' + t + '</span><span>' + sub + '</span></div>'; };
     h = head + band('N', '전국 통계', '전국 직업계고 졸업자 기준') + ['ov', 'tr', 'ty', 'sj', 'wp', 'rt'].map(function (k) { return parts[k] || ''; }).join('') +
-      band('R', '지역 통계', esc(G.sido) + ' 기준(시도 선택 가능)' + (G.sido === '광주' ? '' : '')) + ['gj', 'rg', 'sc'].map(function (k) { return parts[k] || ''; }).join('') + (parts.df || '');
+      band('R', '지역 통계', esc(G.sido) + ' 기준(시도 선택 가능)' + (G.sido === '광주' ? '' : '')) + ['gj', 'gn', 'rg', 'sc'].map(function (k) { return parts[k] || ''; }).join('') + (parts.df || '');
     el.innerHTML = h;
 
     /* 막대 너비(CSSOM으로 설정: CSP 준수) */

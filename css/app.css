@@ -519,3 +519,12 @@ body{background:#fff;color:var(--ink);letter-spacing:-.01em}
 @media (max-width:1100px){.tiles{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
 .ssec .sh{border-top:2px solid #cfdcf5;color:#0f2f73}
+/* 광주·전남 진로 구성 막대 */
+.stackrow{margin:12px 0 4px}
+.stackrow>b{display:block;font-size:.95rem}
+.stackbar .sb3{background:var(--s3);border-left:2px solid var(--surface)}
+.stackbar .sb4{background:var(--s4);border-left:2px solid var(--surface)}
+.stackbar .sb5{background:#9aa3af;border-left:2px solid var(--surface)}
+.stackbar span:first-child{border-left:0}
+.legend i.c5{background:#9aa3af}
+.stackbar .sb6{background:#e5484d;border-left:2px solid var(--surface)} .legend i.c6{background:#e5484d}
